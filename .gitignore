@@ -2,6 +2,7 @@
 bin
 obj
 packages
+MdxcClient.v11.suo
 
 # mstest test results
 TestResults
