@@ -56,8 +56,8 @@ parameter.Value = "Zone";
 #### Member properties
 
 Member properties are special attributes of a given member.  They allow you to access these values from the member without having to specific them in your MDX query.
-Currently there are three that are supported; Caption, LevelName, UniqueName.  These properties can be applied to both types of tilde parameters(named and ordinal).
-To utilize them, the are pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
+Currently there are three that are supported; *Caption*, *LevelName*, *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
+To utilize them, they are pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
 These member properties are only applied to members on rows.
 
 #### Example
@@ -72,26 +72,26 @@ parameter.Value = "Zone";
 
 Rather than limiting where parameters can be used in an MDX query, MdxClient allows parameters to be placed anywhere 
 in the body of the query.  Text replacement is used for generating the final query that gets executed. Take care on your parameter names.
-If you would have one parameter @@Unit and another @@UnitName.  The replacement could replace part of the second token and thus not replace
+If you would have one parameter @Unit and another @UnitName.  The replacement could replace part of the second token and thus not replace
 the intended value.
 
 For example, note the following MDX query with parameters:
 
-```sql
+```mdx
 WITH 
 SET EntitiesWithScores AS 
 FILTER([Employee].[Employee Guid].[Employee Guid],[Measures].[Response Count] > 0) 
 MEMBER DisplayScore AS 
-ROUND([Measures].[Response Computation], @@DisplayPrecision) 
+ROUND([Measures].[Response Computation], @DisplayPrecision) 
 SELECT {DisplayScore} on 0, 
-([EntitiesWithScores], @@ReportPeriod:@@ReportPeriod.lead(@@trendLag) ) on 1 
+([EntitiesWithScores], @ReportPeriod:@ReportPeriod.lead(@trendLag) ) on 1 
 FROM [Report] 
 WHERE 
 ( 
-     @@Entity, 
-     @@Question, 
-     @@ComputationType, 
-     @@SummaryPeriod 
+     @Entity, 
+     @Question, 
+     @ComputationType, 
+     @SummaryPeriod 
 )
 ```
 
@@ -104,20 +104,20 @@ Usage
 using(MdxConnection connection = new MdxConnection(connectionString))
 {
     connection.Open();
-    string query = @@"SELECT {[Measures].[Computation]} on 0,
+    string query = @"SELECT {[Measures].[Computation]} on 0,
             ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
             FROM [CUBE]
-            where (@@Unit,
+            where (@Unit,
             [Computation].[Computation Name].&[Mean],              
             [Report Period].[Report Period Name].&[Dec-10],
                 [Report Period].[Report Period Type].&[Month]        
             )";
     DynamicParameters parms = new DynamicParameters();
-    parms.Add("@@Unit", "[Unit].[Organization].[Region].&[Central].&[Toledo Store]");
+    parms.Add("@Unit", "[Unit].[Organization].[Region].&[Central].&[Toledo Store]");
     parms.Add("~0", "label");
     parms.Add("~2", "score");
 
-    var x = connection.Query&lt;StandardScore&gt;(query, parms);                 
+    var x = connection.Query<StandardScore>(query, parms);                 
 }
 ```
 
@@ -130,7 +130,7 @@ MdxConnection connection = new MdxConnection(connectionString);
 using (connection)
 {
     connection.Open();
-    string query = @@"SELECT [Measures].[Computation] on 0,
+    string query = @"SELECT [Measures].[Computation] on 0,
                     [Unit].[Unit].&[Toledo Store] on 1
                     FROM [CUBE]";
 
