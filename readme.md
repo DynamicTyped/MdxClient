@@ -12,7 +12,7 @@ execute MDX queries against SQL Server Analysis Services. It is very similar to 
 MdxClient was designed to allow MDX queries to be executed and used by ORM (Object Relational Mapping) solutions.  
 Specifically, it has been used against the [Dapper](http://code.google.com/p/dapper-dot-net/) Micro ORM.  
 Additionally, support has been provided for profiling the execution of MDX queries using 
-[MVC Mini Profiler](http://code.google.com/p/mvc-mini-profiler/).
+[Mini Profiler](http://miniprofiler.com/).
 
 Although designed for ORM solutions, since MdxClient is a functional .NET Framework Data Provider, it can be utilized 
 by any .NET application wanting to use the functionality provided to execute MDX queries and return data by using standard 
@@ -55,9 +55,9 @@ parameter.Value = "Zone";
 
 #### Member properties
 
-Member properties are special attributes of a given member.  They allow you to access these values from the member without having to specific them in your MDX query.
-Currently there are three that are supported; *Caption*, *LevelName*, *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
-To utilize them, they are pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
+Member properties are special attributes of a given member.  They allow you to access values from the member without having to specify them in your MDX query.
+Currently there are three that are supported; *Caption*, *LevelName*, and *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
+To utilize them, they must be pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
 These member properties are only applied to members on rows.
 
 #### Example
@@ -71,9 +71,7 @@ parameter.Value = "Zone";
 ### Different handling of Parameters
 
 Rather than limiting where parameters can be used in an MDX query, MdxClient allows parameters to be placed anywhere 
-in the body of the query.  Text replacement is used for generating the final query that gets executed. Take care on your parameter names.
-If you would have one parameter @Unit and another @UnitName.  The replacement could replace part of the second token and thus not replace
-the intended value.
+in the body of the query.  Text replacement is used for generating the final query that gets executed. 
 
 For example, note the following MDX query with parameters:
 
@@ -94,6 +92,9 @@ WHERE
      @SummaryPeriod 
 )
 ```
+
+Take care on your parameter names. If you have one parameter @Unit and another @UnitName, the replacement could replace part of the second token and thus not replace
+the intended value.
 
 Usage
 -----
