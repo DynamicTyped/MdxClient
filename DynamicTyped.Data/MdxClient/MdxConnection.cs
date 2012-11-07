@@ -95,7 +95,7 @@ namespace DynamicTyped.Data.MdxClient
             get { return _connection.ConnectionTimeout; }
         }
 
-        public MdxCommand CreateCommand()
+        public new MdxCommand CreateCommand()
         {
             return (MdxCommand)base.CreateCommand();
         }

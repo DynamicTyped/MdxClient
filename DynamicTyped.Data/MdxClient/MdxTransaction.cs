@@ -32,7 +32,7 @@ namespace DynamicTyped.Data.MdxClient
         /// <summary>
         /// Gets the MdxConnection that the MdxTransaction uses.
         /// </summary>
-        public MdxConnection Connection
+        public new MdxConnection Connection
         {
             get
             {
