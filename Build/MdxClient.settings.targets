@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" $(Configuration) == 'Release' ">
+    <!-- Property that enables building a package from a project -->
+    <BuildPackage Condition=" '$(BuildPackage)' == '' ">true</BuildPackage>
+
+    <!-- Determines where Nuget packages are dropped once they are created -->
+    <PackageOutputDir Condition=" '$(PackageOutputDir)' == '' ">$(SolutionDir)\Bin\Packages</PackageOutputDir>
+  </PropertyGroup>
+
+  <!-- Ensures the Nuget package drop folder is created before the packages are built -->
+  <Target Name="CreateDropFolder" BeforeTargets="BuildPackage">
+    <MakeDir Directories="$(PackageOutputDir)" Condition=" !Exists($(PackageOutputDir)) "/>
+  </Target>
+</Project>

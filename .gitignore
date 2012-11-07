@@ -6,3 +6,7 @@ MdxClient.v11.suo
 
 # mstest test results
 TestResults
+
+# VS User Options
+*.user
+*.suo
