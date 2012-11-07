@@ -23,15 +23,15 @@ Features
 
 ### "Tilde Parameters"
 
-        Columns returned from ADOMD.NET queries are not friendly for mapping to class properties in .NET.  For example, 
-        [Organization].[Organization].[Level 06] or [Measures].[Collection Count].  MdxClient has specialized parameters 
-        ("Tilde Parameters") that can be passed in to map columns returned from an MDX query to more friendly column names.
+Columns returned from ADOMD.NET queries are not friendly for mapping to class properties in .NET.  For example, 
+[Organization].[Organization].[Level 06] or [Measures].[Collection Count].  MdxClient has specialized parameters 
+("Tilde Parameters") that can be passed in to map columns returned from an MDX query to more friendly column names.
 
 #### Syntax
 
-            Parameter name: Tilde + MDX column
+Parameter name: Tilde + MDX column
 
-		    Parameter value: Friendly name
+Parameter value: Friendly name
 
 #### Example
 
@@ -39,10 +39,11 @@ Features
 MdxParameter parameter = new MdxParameter();
 parameter.ParameterName = "~[Organization].[Organization].[Level 06]";
 parameter.Value = "Zone";
+```
 
 #### Ordinal
 
-            In addition to using the column name, an ordinal can be used.
+In addition to using the column name, an ordinal can be used.
 
 #### Example
 
@@ -50,6 +51,7 @@ parameter.Value = "Zone";
 MdxParameter parameter = new MdxParameter();
 parameter.ParameterName = "~0";
 parameter.Value = "Zone";
+```
 
 #### Member properties
 
@@ -64,6 +66,7 @@ These member properties are only applied to members on rows.
 MdxParameter parameter = new MdxParameter();
 parameter.ParameterName = "~0##UniqueName##";
 parameter.Value = "Zone";
+```
 
 ### Different handling of Parameters
 
@@ -90,6 +93,7 @@ WHERE
      @@ComputationType, 
      @@SummaryPeriod 
 )
+```
 
 Usage
 -----
@@ -115,6 +119,7 @@ using(MdxConnection connection = new MdxConnection(connectionString))
 
     var x = connection.Query&lt;StandardScore&gt;(query, parms);                 
 }
+```
 
 ### DataReader
 
@@ -141,3 +146,4 @@ using (connection)
         }
     }    
 }
+```
