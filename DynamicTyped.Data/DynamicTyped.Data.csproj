@@ -67,6 +67,9 @@
     <Compile Include="MdxClient\Tuple.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\DynamicTyped.Data.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\Build\MdxClient.settings.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
