@@ -254,7 +254,7 @@ namespace MdxClient
                 return column.Index;
             }
             
-            throw new IndexOutOfRangeException("Could not find specified column in results");
+            throw new ArgumentException("Could not find specified column in results");
         }
 
         /// <summary>
@@ -365,14 +365,7 @@ namespace MdxClient
         {
             if (disposing)
             {
-                try
-                {
-                    this.Close();
-                }
-                catch (Exception e)
-                {
-                    throw new SystemException("An exception of type " + e.GetType() + " was encountered while closing the MdxDataReader.");
-                }
+                this.Close();               
             }
 
             base.Dispose(disposing);

@@ -63,25 +63,19 @@ namespace MdxClient
         /// Rolls back the transaction.
         /// </summary>
         public override void Rollback()
-        { }
+        { }       
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
-                try
+            {                
+                if (null != this._connection)
                 {
-                    if (null != this._connection)
-                    {
-                        this.Rollback();
-                    }
-                    this._connection = null;
+                    this.Rollback();
                 }
-                catch (Exception e)
-                {
-                    throw new SystemException("An exception of type " + e.GetType() + " was encountered while closing the MdxTransaction.");
-                }
+                this._connection = null;                
             }
+            base.Dispose(disposing);
         }
     }
 }

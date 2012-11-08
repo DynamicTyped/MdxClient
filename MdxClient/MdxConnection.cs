@@ -140,15 +140,8 @@ namespace MdxClient
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-            {
-                try
-                {
-                    _connection.Dispose();
-                }
-                catch (Exception e)
-                {
-                    throw new SystemException("An exception of type " + e.GetType() + " was encountered while closing the MdxTransaction.");
-                }
+            {                
+                _connection.Dispose();                
             }
 
             base.Dispose(disposing);
