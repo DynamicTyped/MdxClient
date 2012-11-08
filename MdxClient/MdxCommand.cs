@@ -383,7 +383,7 @@ namespace MdxClient
             }            
         }
 
-        private Type GetTypeFromDbType(DbType? dbType)
+        private static Type GetTypeFromDbType(DbType? dbType)
         {
             if (null == dbType)
             {
@@ -530,7 +530,7 @@ namespace MdxClient
             return type;
         }
 
-        private Type ConvertXmlTypeToType(string type)
+        private static Type ConvertXmlTypeToType(string type)
         {
             Type t = typeof(string);
 
@@ -565,7 +565,7 @@ namespace MdxClient
             return t;
         }               
 
-        private int convertIt(string item)
+        private static int convertIt(string item)
         {
             int value = -1;
             if (int.TryParse(item, out value))
@@ -580,7 +580,7 @@ namespace MdxClient
             return _columnMap.Where(a => convertIt(a.NameWithoutPrefixes) == c.Ordinal || a.Value.ToString() == c.Name).SingleOrDefault();
         }
 
-        private void AdjustValueFromColumnType(Cell cell, int columnIndex, ResultSet crs)
+        private static void AdjustValueFromColumnType(Cell cell, int columnIndex, ResultSet crs)
         {
             // change type was giving odd results when a culture was passed in on the thread, for example German 5.324145E1 came out as 5324145 instead of 53.24145
             // we give it invariant culture to fix this.  It will be up to the end user to apply formatting.
@@ -681,7 +681,7 @@ namespace MdxClient
             }
         }
 
-        private IEnumerable<Cell> AddCellsFromMemberProperties(IEnumerable<ColumnMap> specialColumns, Member member, int cellOrdinal, int columnOrdinal)
+        private static IEnumerable<Cell> AddCellsFromMemberProperties(IEnumerable<ColumnMap> specialColumns, Member member, int cellOrdinal, int columnOrdinal)
         {
             return specialColumns
                    .Where(a => a.DoesMapMatchMember(member, columnOrdinal))
@@ -700,7 +700,7 @@ namespace MdxClient
         /// </summary>
         /// <param name="crs"></param>
         /// <param name="columnMap"></param>
-        private void AddColumnsFromRowProperties(ResultSet crs, IEnumerable<ColumnMap> columnMap)
+        private static void AddColumnsFromRowProperties(ResultSet crs, IEnumerable<ColumnMap> columnMap)
         {
             var max = crs.Columns.Select(a => a.Ordinal).Max();
             foreach(var map in columnMap)
