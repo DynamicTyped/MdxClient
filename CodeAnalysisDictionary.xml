@@ -2,11 +2,6 @@
   <Words>
     <Recognized>
       <Word>Mdx</Word>
-        <Word>DbType</Word>
-        <Word>SqlDbType</Word>
-        <Word>MdxTransaction</Word>
-        <Word>MdxConnection</Word>
-        <Word>MdxCommand</Word>
     </Recognized>
   </Words>
 </Dictionary>
