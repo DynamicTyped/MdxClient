@@ -116,7 +116,7 @@ namespace MdxClient
             return GetType<byte>(ordinal);
         }
 
-        public override long GetBytes(int ordinal, long fieldOffset, byte[] buffer, int bufferoffset, int length)
+        public override long GetBytes(int ordinal, long dataOffset, byte[] buffer, int bufferOffset, int length)
         {
             throw new NotSupportedException();
         }
@@ -253,7 +253,7 @@ namespace MdxClient
             {
                 return column.Index;
             }
-
+            
             throw new IndexOutOfRangeException("Could not find specified column in results");
         }
 

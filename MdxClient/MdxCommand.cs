@@ -710,11 +710,6 @@ namespace MdxClient
             }
         }                
 
-        private int GetOrdinalForCell(int rowIndex, int columnOrdinal, int columnCount, int rowColumnCount)
-        {
-            return ((rowIndex - 1) * (columnCount + rowColumnCount) + columnOrdinal);
-        }
-
         private ColumnMap GetColumnMap(string nameFromMdx)
         {            
             return _columnMap.Where(a => a.NameWithoutPrefixes == nameFromMdx).SingleOrDefault();
