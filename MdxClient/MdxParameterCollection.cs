@@ -70,9 +70,12 @@ namespace MdxClient
         /// <param name="values">An array of values of type MdxParameter to add to the collection.</param>
         public override void AddRange(Array values)
         {
-            foreach (object item in values)
+            if (null != values)
             {
-                this.Add(item);
+                foreach (object item in values)
+                {
+                    this.Add(item);
+                }
             }
         }
 

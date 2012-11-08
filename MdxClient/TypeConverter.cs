@@ -154,7 +154,7 @@ namespace MdxClient
             }
             if (retObj == null)
             {
-                throw new ApplicationException("Referenced an unsupported Type");
+                throw new ArgumentException("Referenced an unsupported Type");                
             }
             return (DbTypeMapEntry)retObj;
         }
@@ -173,7 +173,7 @@ namespace MdxClient
             }
             if (retObj == null)
             {
-                throw new ApplicationException("Referenced an unsupported DbType");
+                throw new ArgumentException("Referenced an unsupported DbType");
             }
             return (DbTypeMapEntry)retObj;
         }
@@ -192,7 +192,7 @@ namespace MdxClient
             }
             if (retObj == null)
             {
-                throw new ApplicationException("Referenced an unsupported SqlDbType");
+                throw new ArgumentException("Referenced an unsupported SqlDbType");
             }
 
             return (DbTypeMapEntry)retObj;
