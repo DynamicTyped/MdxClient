@@ -33,11 +33,6 @@ namespace MdxClient
             _connection = new AdomdConnection(connectionString);
         }
 
-        internal MdxConnection(MdxConnection connection)
-        {
-            _connection = new AdomdConnection(connection.Connection);
-        }
-
         internal AdomdConnection Connection
         { 
             get

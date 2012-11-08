@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="Column.cs" />

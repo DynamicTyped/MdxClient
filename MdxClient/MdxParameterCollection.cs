@@ -12,12 +12,10 @@ namespace MdxClient
 {
     public class MdxParameterCollection : DbParameterCollection
 	{
-		private MdxCommand _parent;
 		private ArrayList _items;
 
         internal MdxParameterCollection(MdxCommand parent)
         {
-            this._parent = parent;
             this._items = new ArrayList();
         }
 
