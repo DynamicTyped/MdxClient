@@ -32,6 +32,9 @@ namespace MdxClient
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            if (null == info)
+                throw new ArgumentNullException("info");
+
             info.AddValue("Name", Name);
             info.AddValue("Items", Items);
             info.AddValue("DefaultType", Type);

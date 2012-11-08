@@ -66,6 +66,9 @@ namespace MdxClient
         /// <param name="connection">An MdxConnection representing the connection to SQL Server Analysis Services.</param>
         public MdxCommand(string commandText, MdxConnection connection) 
         {
+            if (null == connection)
+                throw new ArgumentNullException("connection");
+
             _command = new AdomdCommand(commandText, connection.Connection);
             _connection = connection;
             _parameters = null;
@@ -163,6 +166,7 @@ namespace MdxClient
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MdxCommand"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MdxTransaction"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MdxConnection")]
         protected override DbTransaction DbTransaction
         {
             get
@@ -203,14 +207,14 @@ namespace MdxClient
             _command.Connection.Open();
 
             var allParameters = GetParams();
-            _columnMap = allParameters.Where(a => a.Name.StartsWith(ColumnMap.ColumnRename));
+            _columnMap = allParameters.Where(a => a.Name.StartsWith(ColumnMap.ColumnRename, StringComparison.OrdinalIgnoreCase));
 
             var parameters = allParameters.Except(_columnMap, new ColumnMapComparer());
 
             foreach (ColumnMap parameter in parameters)
             {
                 // dapper 1.7+ rips off the @, this allows for either @ or no prefix to be found and replaced
-                var name = parameter.Name.StartsWith(ColumnMap.Parameter) ? parameter.Name : ColumnMap.Parameter + parameter.Name;
+                var name = parameter.Name.StartsWith(ColumnMap.Parameter, StringComparison.OrdinalIgnoreCase) ? parameter.Name : ColumnMap.Parameter + parameter.Name;
                 _command.CommandText = _command.CommandText.Replace(name, parameter.Value.ToString());
                 
             }
@@ -341,7 +345,7 @@ namespace MdxClient
                                UniqueName = member.Element(_namespace + "UName").Value,
                                LevelName = member.Element(_namespace + "LName").Value,
                                DimensionProperties = (from property in member.Elements()
-                                                      where property.Name.LocalName.StartsWith("_x005B_")
+                                                      where property.Name.LocalName.StartsWith("_x005B_", StringComparison.OrdinalIgnoreCase)
                                                       select new DimensionProperty()
                                                       {
                                                           UniqueName = System.Xml.XmlConvert.DecodeName(property.Name.LocalName),

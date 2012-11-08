@@ -43,22 +43,22 @@ namespace MdxClient
     {
         internal static IEnumerable<ColumnMap> GetMemberProperties(this IEnumerable<ColumnMap> maps)
         {
-            return maps.Where(a => a.Name.EndsWith(ColumnMap.LevelNameToken) ||
-                                   a.Name.EndsWith(ColumnMap.UniqueNameToken) ||
-                                   a.Name.EndsWith(ColumnMap.CaptionToken));
+            return maps.Where(a => a.Name.EndsWith(ColumnMap.LevelNameToken, StringComparison.OrdinalIgnoreCase) ||
+                                   a.Name.EndsWith(ColumnMap.UniqueNameToken, StringComparison.OrdinalIgnoreCase) ||
+                                   a.Name.EndsWith(ColumnMap.CaptionToken, StringComparison.OrdinalIgnoreCase));
         }
 
         internal static string GetMemberProperty(this ColumnMap map, Member member)
         {
-            if (map.Name.EndsWith(ColumnMap.CaptionToken))
+            if (map.Name.EndsWith(ColumnMap.CaptionToken, StringComparison.OrdinalIgnoreCase))
             {
                 return member.Caption;
             }
-            else if(map.Name.EndsWith(ColumnMap.LevelNameToken))
+            else if (map.Name.EndsWith(ColumnMap.LevelNameToken, StringComparison.OrdinalIgnoreCase))
             {
                 return member.LevelName;
             }
-            else if (map.Name.EndsWith(ColumnMap.UniqueNameToken))
+            else if (map.Name.EndsWith(ColumnMap.UniqueNameToken, StringComparison.OrdinalIgnoreCase))
             {
                 return member.UniqueName;
             }

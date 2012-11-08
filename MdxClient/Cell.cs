@@ -29,6 +29,9 @@ namespace MdxClient
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            if (null == info)
+                throw new ArgumentNullException("info");
+
             info.AddValue("FormattedValue", FormattedValue);
             info.AddValue("Value", Value);
             info.AddValue("Ordinal", Ordinal);
