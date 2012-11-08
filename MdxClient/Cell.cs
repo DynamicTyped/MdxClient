@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     [Serializable()]
     internal class Cell : ISerializable

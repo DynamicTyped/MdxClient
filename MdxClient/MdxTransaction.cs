@@ -5,7 +5,7 @@ using System.Text;
 using System.Data;
 using System.Data.Common;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     /// <summary>
     /// Represents a transaction to be performed on a SQL Server Analysis Services database.

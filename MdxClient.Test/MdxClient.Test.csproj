@@ -68,9 +68,9 @@
     <Compile Include="UnitTestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DynamicTyped.Data\DynamicTyped.Data.csproj">
+    <ProjectReference Include="..\MdxClient\MdxClient.csproj">
       <Project>{41bc5af2-c300-4d69-9bc9-27655522953a}</Project>
-      <Name>DynamicTyped.Data</Name>
+      <Name>MdxClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

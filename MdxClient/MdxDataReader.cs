@@ -8,7 +8,7 @@ using System.Globalization;
 using System.Collections;
 using System.Data.Common;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     public class MdxDataReader : DbDataReader
     {

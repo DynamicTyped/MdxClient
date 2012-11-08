@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/DynamicTyped/MdxClient</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixed a bug where a column only query was being used and the last column resulted in a NULL value. A cell was not being added in for the null value.</releaseNotes>
+    <releaseNotes>Initial public release</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>data, ado md, mdx, ssas</tags>
   </metadata>

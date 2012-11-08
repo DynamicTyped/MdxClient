@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace DynamicTyped.Data.Common
+namespace MdxClient
 {
     /// <summary>
     /// Convert a base data type to another base data type

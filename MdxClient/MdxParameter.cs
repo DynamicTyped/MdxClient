@@ -6,7 +6,7 @@ using System.Data;
 using Microsoft.AnalysisServices.AdomdClient;
 using System.Data.Common;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     /// <summary>
     /// Represents a parameter to an MdxCommand

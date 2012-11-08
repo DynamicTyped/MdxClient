@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.ComponentModel;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     /// <summary>
     /// Represents a set of data commands and a database connection that are used to fill the System.Data.DataSet and update a 

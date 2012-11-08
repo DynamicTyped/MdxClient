@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     internal class Member
     {

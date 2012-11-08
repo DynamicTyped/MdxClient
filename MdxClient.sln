@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicTyped.Data", "DynamicTyped.Data\DynamicTyped.Data.csproj", "{41BC5AF2-C300-4D69-9BC9-27655522953A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MdxClient", "MdxClient\MdxClient.csproj", "{41BC5AF2-C300-4D69-9BC9-27655522953A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicTyped.Data.Test", "DynamicTyped.Data.Test\DynamicTyped.Data.Test.csproj", "{4BEAD0A8-84DF-4CD6-B793-A9F93DA53F3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MdxClient.Test", "MdxClient.Test\MdxClient.Test.csproj", "{4BEAD0A8-84DF-4CD6-B793-A9F93DA53F3C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{100497D6-9C3B-4998-9834-46154A2755FD}"
 EndProject

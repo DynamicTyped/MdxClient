@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DynamicTyped.Data.MdxClient;
+using MdxClient;
 
 namespace Test
 {

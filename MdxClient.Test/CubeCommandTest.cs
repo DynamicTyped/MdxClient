@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DynamicTyped.Data.MdxClient;
+using MdxClient;
 using System.Collections.Generic;
 using System.Linq;
 

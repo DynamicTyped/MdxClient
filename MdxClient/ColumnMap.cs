@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     internal class ColumnMap
     {

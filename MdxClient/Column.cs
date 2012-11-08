@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Runtime.Serialization;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     [Serializable()]
     internal class Column : ISerializable

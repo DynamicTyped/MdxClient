@@ -6,7 +6,7 @@ using Microsoft.AnalysisServices.AdomdClient;
 using System.Data;
 using System.Data.Common;
 
-namespace DynamicTyped.Data.MdxClient
+namespace MdxClient
 {
     /// <summary>
     /// Represents an open connection to a SQL Server Analysis Services database.
