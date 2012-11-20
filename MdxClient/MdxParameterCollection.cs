@@ -48,7 +48,7 @@ namespace MdxClient
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int Add(object value)
         {
-            this.ValidateType(value);
+            MdxParameterCollection.ValidateType(value);
             this.Add((MdxParameter)value);
             return this.Count - 1;
         }
@@ -224,7 +224,7 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object to insert into the collection.</param>
         public override void Insert(int index, object value)
         {
-            this.ValidateType(value);
+            MdxParameterCollection.ValidateType(value);
             this.Insert(index, (MdxParameter)value);
         }
 
@@ -273,7 +273,7 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object to remove.</param>
         public override void Remove(object value)
         {
-            this.ValidateType(value);
+            MdxParameterCollection.ValidateType(value);
             this.Remove((MdxParameter)value);
         }
 
@@ -300,13 +300,13 @@ namespace MdxClient
         protected override void SetParameter(string parameterName, DbParameter value)
         {
             int index = this.RangeCheck(parameterName);
-            this.ValidateType(value);
+            MdxParameterCollection.ValidateType(value);
             this.Replace(index, (MdxParameter)value);
         }
 
         protected override void SetParameter(int index, DbParameter value)
         {
-            this.ValidateType(value);
+            MdxParameterCollection.ValidateType(value);
             this[index] = (MdxParameter)value;
         }
 
@@ -316,14 +316,6 @@ namespace MdxClient
 		public override object SyncRoot
 		{
 			get { return this; }
-		}
-
-		private Type ItemType
-		{
-			get
-			{
-				return typeof(MdxParameter);
-			}
 		}
 
         private MdxParameter Find(string parameterName)
@@ -402,13 +394,13 @@ namespace MdxClient
 			}
 		}
 
-		private void ValidateType(object value)
+		private static void ValidateType(object value)
 		{
 			if (value == null)
 			{
 				throw new ArgumentNullException("value");
 			}
-			if (!this.ItemType.IsInstanceOfType(value))
+			if (!typeof(MdxParameter).IsInstanceOfType(value))
 			{
 				throw new ArgumentException("wrong type", "value");
 			}

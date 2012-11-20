@@ -38,12 +38,7 @@ namespace MdxClient
             // Normally I would utilize the this on the constructor to reduce code, but since we are 
             // using an internal object the this's overwrite each other, so repeating code :(
             
-            _command = new AdomdCommand();
-            _connection = null;
-            _parameters = null;
-            _transaction = null;
-            this.CommandTimeout = 0;
-            this.CommandText = null;
+            _command = new AdomdCommand();      
         }
 
         /// <summary>
@@ -52,11 +47,7 @@ namespace MdxClient
         /// <param name="commandText">The text of the query.</param>
         public MdxCommand(string commandText) 
         {
-            _command = new AdomdCommand(commandText);            
-            _connection = null;
-            _parameters = null;
-            _transaction = null;
-            this.CommandTimeout = 0;
+            _command = new AdomdCommand(commandText);                      
         }
 
         /// <summary>
@@ -71,9 +62,6 @@ namespace MdxClient
 
             _command = new AdomdCommand(commandText, connection.Connection);
             _connection = connection;
-            _parameters = null;
-            _transaction = null;
-            this.CommandTimeout = 0;
         }
 
         #endregion

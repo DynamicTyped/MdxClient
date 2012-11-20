@@ -290,9 +290,12 @@ namespace MdxClient
         public override int GetValues(object[] values)
         {
             int i = 0;
-            for (; i < values.Length && i < _resultSet.Columns.Count; i++)
+            if (null != values)
             {
-                values[i] = _resultSet.Rows[_currentRow].Cells[i].Value;
+                for (; i < values.Length && i < _resultSet.Columns.Count; i++)
+                {
+                    values[i] = _resultSet.Rows[_currentRow].Cells[i].Value;
+                }
             }
 
             return i;

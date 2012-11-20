@@ -101,7 +101,7 @@ namespace MdxClient
         /// </summary>
         public override object Value { get; set; }
 
-        object ICloneable.Clone()  // TODO: Is this needed?
+        public object Clone()  // TODO: Is this needed?
         {
             return new MdxParameter(this.ParameterName, this.Value);
         }
