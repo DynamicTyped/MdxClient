@@ -59,7 +59,10 @@ namespace MdxClient
         /// <param name="values">An array of values of type MdxParameter to add to the collection.</param>
         public void AddRange(MdxParameter[] values)
         {
-            AddRange(values);
+            if (null != values)
+            {
+                _items.AddRange(values);
+            }
         }
 
         /// <summary>
@@ -70,10 +73,7 @@ namespace MdxClient
         {
             if (null != values)
             {
-                foreach (object item in values)
-                {
-                    Add(item);
-                }
+                _items.AddRange(values);
             }
         }
 
