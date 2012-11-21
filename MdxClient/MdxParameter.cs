@@ -11,15 +11,15 @@ namespace MdxClient
     /// <summary>
     /// Represents a parameter to an MdxCommand
     /// </summary>
-    public class MdxParameter : DbParameter, ICloneable
+    public sealed class MdxParameter : DbParameter, ICloneable
     {
         /// <summary>
         /// Initializes a new instance of the MdxParameter class.
         /// </summary>
         public MdxParameter()
         {
-            this.DbType = System.Data.DbType.AnsiString;
-            this.Direction = ParameterDirection.Input;           
+            DbType = System.Data.DbType.AnsiString;
+            Direction = ParameterDirection.Input;           
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace MdxClient
         public MdxParameter(string parameterName, object value)
             : this()
         {
-            this.ParameterName = parameterName;
-            this.Value = value;
+            ParameterName = parameterName;
+            Value = value;
         }
 
         internal MdxParameterCollection Parent { get; set; }
@@ -62,7 +62,7 @@ namespace MdxClient
         /// </summary>
         public override void ResetDbType()
         {
-            this.DbType = System.Data.DbType.AnsiString;
+            DbType = System.Data.DbType.AnsiString;
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace MdxClient
 
         public object Clone()  // TODO: Is this needed?
         {
-            return new MdxParameter(this.ParameterName, this.Value);
+            return new MdxParameter(ParameterName, Value);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace MdxClient
         /// <returns></returns>
         public override string ToString()
         {
-            return this.ParameterName;
+            return ParameterName;
         }
     }
 }

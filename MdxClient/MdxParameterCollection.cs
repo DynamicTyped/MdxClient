@@ -14,9 +14,9 @@ namespace MdxClient
 	{
 		private ArrayList _items;
 
-        internal MdxParameterCollection(MdxCommand parent)
+        internal MdxParameterCollection()
         {
-            this._items = new ArrayList();
+            _items = new ArrayList();
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object to be added.</param>
         public MdxParameter Add(MdxParameter value)
         {
-            this.Validate(-1, value);
+            Validate(-1, value);
             value.Parent = this;
-            this._items.Add(value);
+            _items.Add(value);
             return value;
         }
 
@@ -38,7 +38,7 @@ namespace MdxClient
         /// <param name="value">The value of the MdxParameter object to be created.</param>
         public MdxParameter Add(string parameterName, object value)
         {
-            return this.Add(new MdxParameter(parameterName, value));
+            return Add(new MdxParameter(parameterName, value));
         }
 
         /// <summary>
@@ -49,8 +49,8 @@ namespace MdxClient
         public override int Add(object value)
         {
             MdxParameterCollection.ValidateType(value);
-            this.Add((MdxParameter)value);
-            return this.Count - 1;
+            Add((MdxParameter)value);
+            return Count - 1;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace MdxClient
         /// <param name="values">An array of values of type MdxParameter to add to the collection.</param>
         public void AddRange(MdxParameter[] values)
         {
-            this.AddRange(values);
+            AddRange(values);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace MdxClient
             {
                 foreach (object item in values)
                 {
-                    this.Add(item);
+                    Add(item);
                 }
             }
         }
@@ -82,12 +82,12 @@ namespace MdxClient
         /// </summary>
         public override void Clear()
         {
-            int count = this._items.Count;
+            int count = _items.Count;
             for (int i = 0; i < count; i++)
             {
-                ((MdxParameter)this._items[i]).Parent = null;
+                ((MdxParameter)_items[i]).Parent = null;
             }
-            this._items.Clear();
+            _items.Clear();
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace MdxClient
         /// <param name="value">The value of the MdxParameter to look for in the collection.</param>
         public bool Contains(MdxParameter value)
         {
-            return -1 != this.IndexOf(value);
+            return -1 != IndexOf(value);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace MdxClient
         /// <param name="value">The value of the MdxParameter to look for in the collection.</param>
         public override bool Contains(object value)
         {
-            return this.Contains((MdxParameter)value);
+            return Contains((MdxParameter)value);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace MdxClient
         /// <param name="value">The name of the MdxParameter to look for in the collection.</param>
         public override bool Contains(string value)
         {
-            return -1 != this.IndexOf(value);
+            return -1 != IndexOf(value);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace MdxClient
         /// <param name="index">The index in the collection to copy the items.</param>
         public void CopyTo(MdxParameter[] array, int index)
         {
-            this._items.CopyTo(array, index);
+            _items.CopyTo(array, index);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace MdxClient
         /// <param name="index">The index in the collection to copy the items.</param>
         public override void CopyTo(Array array, int index)
         {
-            this._items.CopyTo(array, index);
+            _items.CopyTo(array, index);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace MdxClient
         {
             get
             {
-                return this._items.Count;
+                return _items.Count;
             }
         }
 
@@ -153,12 +153,12 @@ namespace MdxClient
         /// </summary>
         public override IEnumerator GetEnumerator()
         {
-            return this._items.GetEnumerator();
+            return _items.GetEnumerator();
         }
 
         protected override DbParameter GetParameter(string parameterName)
         {
-            MdxParameter mdxParameter = this.Find(parameterName);
+            MdxParameter mdxParameter = Find(parameterName);
             if (mdxParameter == null)
                 throw new ArgumentException(parameterName, "parameterName");
             
@@ -168,10 +168,10 @@ namespace MdxClient
         protected override DbParameter GetParameter(int index)
         {
             
-            if (this._items.IndexOf(index) < 0)
+            if (_items.IndexOf(index) < 0)
                 throw new ArgumentException("Index does not exist", "index");
 
-            return (DbParameter) this._items[index];
+            return (DbParameter) _items[index];
         }
 
         /// <summary>
@@ -180,10 +180,10 @@ namespace MdxClient
         /// <param name="parameterName">The name of the MdxParameter object in the collection.</param>
         public override int IndexOf(string parameterName)
         {
-            int count = this._items.Count;
+            int count = _items.Count;
             for (int i = 0; i < count; i++)
             {
-                if (parameterName == ((MdxParameter)this._items[i]).ParameterName)
+                if (parameterName == ((MdxParameter)_items[i]).ParameterName)
                 {
                     return i;
                 }
@@ -197,7 +197,7 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object in the collection.</param>
         public int IndexOf(MdxParameter value)
         {
-            return this._items.IndexOf(value);
+            return _items.IndexOf(value);
         }
 
         /// <summary>
@@ -206,15 +206,15 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object in the collection.</param>
         public override int IndexOf(object value)
         {
-            return this.IndexOf((MdxParameter)value);
+            return IndexOf((MdxParameter)value);
         }
 
 
         public void Insert(int index, MdxParameter value)
         {
-            this.Validate(-1, value);
+            Validate(-1, value);
             value.Parent = this;
-            this._items.Insert(index, value);
+            _items.Insert(index, value);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace MdxClient
         public override void Insert(int index, object value)
         {
             MdxParameterCollection.ValidateType(value);
-            this.Insert(index, (MdxParameter)value);
+            Insert(index, (MdxParameter)value);
         }
 
         /// <summary>
@@ -258,10 +258,10 @@ namespace MdxClient
         /// <param name="value">The MdxParameter object to remove.</param>
         public void Remove(MdxParameter value)
         {
-            int num = this.IndexOf(value);
+            int num = IndexOf(value);
             if (-1 != num)
             {
-                this.RemoveIndex(num);
+                RemoveIndex(num);
                 return;
             }
             throw new ArgumentException("Property does not exist", "value");
@@ -274,7 +274,7 @@ namespace MdxClient
         public override void Remove(object value)
         {
             MdxParameterCollection.ValidateType(value);
-            this.Remove((MdxParameter)value);
+            Remove((MdxParameter)value);
         }
 
         /// <summary>
@@ -283,8 +283,8 @@ namespace MdxClient
         /// <param name="parameterName">The name of the MdxParameter object to remove.</param>
         public override void RemoveAt(string parameterName)
         {
-            int index = this.RangeCheck(parameterName);
-            this.RemoveIndex(index);
+            int index = RangeCheck(parameterName);
+            RemoveIndex(index);
         }
 
         /// <summary>
@@ -293,15 +293,15 @@ namespace MdxClient
         /// <param name="index">The index where the MdxParameter object is located.</param>
         public override void RemoveAt(int index)
         {
-            this.RangeCheck(index);
-            this.RemoveIndex(index);
+            RangeCheck(index);
+            RemoveIndex(index);
         }
 
         protected override void SetParameter(string parameterName, DbParameter value)
         {
-            int index = this.RangeCheck(parameterName);
+            int index = RangeCheck(parameterName);
             MdxParameterCollection.ValidateType(value);
-            this.Replace(index, (MdxParameter)value);
+            Replace(index, (MdxParameter)value);
         }
 
         protected override void SetParameter(int index, DbParameter value)
@@ -324,17 +324,17 @@ namespace MdxClient
 			{
 				throw new ArgumentNullException("parameterName");
 			}
-			int num = this.IndexOf(parameterName);
+			int num = IndexOf(parameterName);
 			if (num < 0)
 			{
 				return null;
 			}
-            return (MdxParameter)this._items[num];
+            return (MdxParameter)_items[num];
 		}
 
 		private void RangeCheck(int index)
 		{
-			if (index < 0 || this.Count <= index)
+			if (index < 0 || Count <= index)
 			{
 				throw new ArgumentOutOfRangeException("index");
 			}
@@ -342,7 +342,7 @@ namespace MdxClient
 
 		private int RangeCheck(string parameterName)
 		{
-			int num = this.IndexOf(parameterName);
+			int num = IndexOf(parameterName);
 			if (num < 0)
 			{
 				throw new ArgumentOutOfRangeException("parameterName");
@@ -352,10 +352,10 @@ namespace MdxClient
 
         private void Replace(int index, MdxParameter newValue)
 		{
-			this.Validate(index, newValue);
-            ((MdxParameter)this._items[index]).Parent = null;
+			Validate(index, newValue);
+            ((MdxParameter)_items[index]).Parent = null;
 			newValue.Parent = this;
-			this._items[index] = newValue;
+			_items[index] = newValue;
 		}
 
         internal void Validate(int index, MdxParameter value)
@@ -370,7 +370,7 @@ namespace MdxClient
 				{
 					throw new ArgumentException("mismatch", "value");
 				}
-				if (index != this.IndexOf(value.ParameterName))
+				if (index != IndexOf(value.ParameterName))
 				{
 					throw new ArgumentException("already exists", "value");
 				}
@@ -383,7 +383,7 @@ namespace MdxClient
 				while (index < 2147483647 && num != -1)
 				{
 					text = "Parameter" + index.ToString(CultureInfo.InvariantCulture);
-					num = this.IndexOf(text);
+					num = IndexOf(text);
 					index++;
 				}
 				if (-1 != num)
@@ -408,8 +408,8 @@ namespace MdxClient
 
         private void RemoveIndex(int index)
         {
-            ((MdxParameter)this._items[index]).Parent = null;
-            this._items.RemoveAt(index);
+            ((MdxParameter)_items[index]).Parent = null;
+            _items.RemoveAt(index);
         }
 	}
 }

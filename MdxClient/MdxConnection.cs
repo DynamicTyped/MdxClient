@@ -102,7 +102,7 @@ namespace MdxClient
 
         public override string DataSource
         {
-            get { return this.ConnectionString; }
+            get { return ConnectionString; }
         }
 
         /// <summary>

@@ -16,7 +16,6 @@ namespace MdxClient
         public string Name { get; set; }
         public object Value { get; set; }
         public DbType? Type { get; set; }
-        public string MappedFrom { get; set;  }
 
         public string NameWithoutPrefixes 
         { 

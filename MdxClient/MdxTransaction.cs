@@ -20,7 +20,7 @@ namespace MdxClient
             if (null == connection)
                 throw new ArgumentNullException("connection");
 
-            this._connection = connection;
+            _connection = connection;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace MdxClient
         {
             get 
             {
-                return this.Connection;
+                return Connection;
             }
         }
 
@@ -69,11 +69,11 @@ namespace MdxClient
         {
             if (disposing)
             {                
-                if (null != this._connection)
+                if (null != _connection)
                 {
-                    this.Rollback();
+                    Rollback();
                 }
-                this._connection = null;                
+                _connection = null;                
             }
             base.Dispose(disposing);
         }

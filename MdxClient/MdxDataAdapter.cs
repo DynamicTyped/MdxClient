@@ -20,11 +20,11 @@ namespace MdxClient
         {
             get
             {
-                return this.SelectCommand;
+                return SelectCommand;
             }
             set
             {
-                this.SelectCommand = (MdxCommand) value;
+                SelectCommand = (MdxCommand) value;
             }
         }
 
@@ -145,7 +145,7 @@ namespace MdxClient
         {
             MdxCommand command = new MdxCommand(selectCommandText);
             command.Connection = selectConnection;
-            this.SelectCommand = command;
+            SelectCommand = command;
         }
 
         /// <summary>

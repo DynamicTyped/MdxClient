@@ -145,12 +145,12 @@ namespace MdxClient
         {
             get
             {
-                if (this._parameters == null)
+                if (_parameters == null)
                 {
-                    this._parameters = new MdxParameterCollection(this);
+                    _parameters = new MdxParameterCollection();
                 }
 
-                return this._parameters;
+                return _parameters;
             }
         }
                 
@@ -158,20 +158,20 @@ namespace MdxClient
         {
             get
             {
-                return this._transaction;
+                return _transaction;
             }
             set
             {
                 if (null == value)
                 {
-                    this._transaction = null;
+                    _transaction = null;
                     return;
                 }
-                if (this._transaction.Connection != this._connection)
+                if (_transaction.Connection != _connection)
                 {
                     throw new InvalidOperationException("MdxCommand.Connection and MdxTransaction.Connection must be the same MdxConnection.");
                 }
-                this._transaction = (MdxTransaction)value;
+                _transaction = (MdxTransaction)value;
             }
         }
 
@@ -335,8 +335,7 @@ namespace MdxClient
                                                       where property.Name.LocalName.StartsWith("_x005B_", StringComparison.OrdinalIgnoreCase)
                                                       select new DimensionProperty()
                                                       {
-                                                          UniqueName = System.Xml.XmlConvert.DecodeName(property.Name.LocalName),
-                                                          Caption = property.Value
+                                                          UniqueName = System.Xml.XmlConvert.DecodeName(property.Name.LocalName)
                                                       }).ToList()
                            }
                        ).ToList()
@@ -357,7 +356,6 @@ namespace MdxClient
 
             if (null != cm)
             {
-                cm.MappedFrom = defaultName;
                 column.Name = cm.Value.ToString();
                 if (null != defalutType)
                 {

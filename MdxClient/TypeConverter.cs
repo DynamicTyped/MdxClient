@@ -9,7 +9,6 @@ namespace MdxClient
     /// <summary>
     /// Convert a base data type to another base data type
     /// 
-    /// from http://www.koders.com/csharp/fid81BF77665BE889E51EB9B3861C9BFBDE4A1A7AC5.aspx
     /// </summary>
     public sealed class TypeConverter
     {
@@ -20,9 +19,9 @@ namespace MdxClient
             public SqlDbType SqlDbType;
             public DbTypeMapEntry(Type type, DbType dbType, SqlDbType sqlDbType)
             {
-                this.Type = type;
-                this.DbType = dbType;
-                this.SqlDbType = sqlDbType;
+                Type = type;
+                DbType = dbType;
+                SqlDbType = sqlDbType;
             }
         };
 

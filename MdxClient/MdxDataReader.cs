@@ -368,7 +368,7 @@ namespace MdxClient
         {
             if (disposing)
             {
-                this.Close();               
+                Close();               
             }
 
             base.Dispose(disposing);

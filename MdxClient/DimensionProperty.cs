@@ -8,7 +8,6 @@ namespace MdxClient
     internal class DimensionProperty
     {
         public string UniqueName { get; set; }
-        public string Caption { get; set; }
 
     }
 }
