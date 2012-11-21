@@ -25,51 +25,24 @@ namespace MdxClient
             }
         };
 
-        private static List<DbTypeMapEntry> _DbTypeList = new List<DbTypeMapEntry>();
-
-        #region Constructors
-
-        static TypeConverter()
+        private static List<DbTypeMapEntry> _DbTypeList = new List<DbTypeMapEntry>()
         {
-            DbTypeMapEntry dbTypeMapEntry = new DbTypeMapEntry(typeof(bool), DbType.Boolean, SqlDbType.Bit);
-            _DbTypeList.Add(dbTypeMapEntry);
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(byte), DbType.Byte, SqlDbType.TinyInt);
-            _DbTypeList.Add(dbTypeMapEntry);
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(byte[]), DbType.Binary, SqlDbType.Image);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(DateTime), DbType.DateTime, SqlDbType.DateTime);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(Decimal), DbType.Decimal, SqlDbType.Decimal);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(double), DbType.Double, SqlDbType.Float);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(Guid), DbType.Guid, SqlDbType.UniqueIdentifier);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(Int16), DbType.Int16, SqlDbType.SmallInt);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(Int32), DbType.Int32, SqlDbType.Int);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(Int64), DbType.Int64, SqlDbType.BigInt);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(object), DbType.Object, SqlDbType.Variant);
-            _DbTypeList.Add(dbTypeMapEntry);
-
-            dbTypeMapEntry = new DbTypeMapEntry(typeof(string), DbType.String, SqlDbType.VarChar);
-            _DbTypeList.Add(dbTypeMapEntry);
-        }
+            new DbTypeMapEntry(typeof(bool), DbType.Boolean, SqlDbType.Bit),
+            new DbTypeMapEntry(typeof(byte), DbType.Byte, SqlDbType.TinyInt),
+            new DbTypeMapEntry(typeof(byte[]), DbType.Binary, SqlDbType.Image),
+            new DbTypeMapEntry(typeof(DateTime), DbType.DateTime, SqlDbType.DateTime),
+            new DbTypeMapEntry(typeof(Decimal), DbType.Decimal, SqlDbType.Decimal),
+            new DbTypeMapEntry(typeof(double), DbType.Double, SqlDbType.Float),
+            new DbTypeMapEntry(typeof(Guid), DbType.Guid, SqlDbType.UniqueIdentifier),
+            new DbTypeMapEntry(typeof(Int16), DbType.Int16, SqlDbType.SmallInt),
+            new DbTypeMapEntry(typeof(Int32), DbType.Int32, SqlDbType.Int),
+            new DbTypeMapEntry(typeof(Int64), DbType.Int64, SqlDbType.BigInt),
+            new DbTypeMapEntry(typeof(object), DbType.Object, SqlDbType.Variant),
+            new DbTypeMapEntry(typeof(string), DbType.String, SqlDbType.VarChar)
+        };
 
         private TypeConverter()
         { }
-
-        #endregion
 
         #region Methods
 
