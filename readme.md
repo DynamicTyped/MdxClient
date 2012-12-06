@@ -33,8 +33,6 @@ Parameter name: Tilde + MDX column
 
 Parameter value: Friendly name
 
-#### Example
-
 ```csharp
 MdxParameter parameter = new MdxParameter();
 parameter.ParameterName = "~[Organization].[Organization].[Level 06]";
@@ -44,8 +42,6 @@ parameter.Value = "Zone";
 #### Ordinal
 
 In addition to using the column name, an ordinal can be used.
-
-#### Example
 
 ```csharp
 MdxParameter parameter = new MdxParameter();
@@ -59,8 +55,6 @@ Member properties are special attributes of a given member.  They allow you to a
 Currently there are three that are supported; *Caption*, *LevelName*, and *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
 To utilize them, they must be pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
 These member properties are only applied to members on rows.
-
-#### Example
 
 ```csharp
 MdxParameter parameter = new MdxParameter();
