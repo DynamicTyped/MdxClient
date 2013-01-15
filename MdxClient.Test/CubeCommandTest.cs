@@ -2,10 +2,10 @@
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MdxClient;
-using System.Collections.Generic;
 using System.Linq;
+using Test;
 
-namespace Test
+namespace DynamicTyped.Data.Test
 {
     
     
@@ -13,26 +13,14 @@ namespace Test
     ///This is a test class for CubeCommandTest and is intended
     ///to contain all CubeCommandTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestClass]
     public class CubeCommandTest
     {
-        private TestContext testContextInstance;
-
         /// <summary>
         ///Gets or sets the test context which provides
         ///information about and functionality for the current test run.
         ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
+        public TestContext TestContext { get; set; }
 
         #region Additional test attributes
         // 
@@ -64,23 +52,23 @@ namespace Test
         //
         #endregion
 
-        [TestMethod()]
+        [TestMethod]
         public void CustomParmsTest()
         {
-            MdxConnection connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCeCubeConnection();
             using (connection)
             {
                 connection.Open();
-                string query = @"SELECT [Measures].[Computation] on 0,
+                const string query = @"SELECT [Measures].[Computation] on 0,
                                 [Unit].[Unit].&[Toledo Store] on 1
                                 FROM [CUBE]";
 
-                DynamicParameters d = new DynamicParameters();
+                var d = new DynamicParameters();
                 d.Add("~[Measures].[Computation]", "Score", DbType.Double);
 
-                dynamic x = connection.Query(query, param: d);
+                dynamic x = connection.Query(query, d);
 
-                foreach (dynamic y in x)
+                foreach (var y in x)
                 {                    
                     Assert.AreEqual(96, y.Score);
                     break;
@@ -88,27 +76,26 @@ namespace Test
             }
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void DataSetTestWithColumnMap()
         {
-            DataSet dataSet = new DataSet();
+            var dataSet = new DataSet();
 
-            MdxConnection connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCeCubeConnection();
             using (connection)
             {
                 connection.Open();
-                string query = @"SELECT [Measures].[Computation] on 0,
+                const string query = @"SELECT [Measures].[Computation] on 0,
                                 [Unit].[Unit].&[Toledo Store] on 1
                                 FROM [CUBE]";
 
 
-                using (MdxCommand command = connection.CreateCommand())
+                using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
                     command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
                     command.Parameters.Add(new MdxParameter("~[Unit].[Unit].[Unit]", "Store"));
-                    MdxDataAdapter dataAdapter = new MdxDataAdapter();
-                    dataAdapter.SelectCommand = command;
+                    var dataAdapter = new MdxDataAdapter {SelectCommand = command};
                     dataAdapter.Fill(dataSet);
                 }
 
@@ -128,12 +115,12 @@ namespace Test
         [TestMethod]
         public void NothingOnRowsTest()
         {
-            MdxConnection connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCeCubeConnection();
             using (connection)
             {
                 connection.Open();
 
-                string query = @"SELECT [Measures].[Computation] on 0 FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Computation] on 0 FROM [CUBE]";
 
                 var x = connection.Query(query);
 
@@ -141,24 +128,23 @@ namespace Test
             }
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void DataSetTestWithoutColumnMap()
         {
-            DataSet dataSet = new DataSet();
+            var dataSet = new DataSet();
 
-            MdxConnection connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCeCubeConnection();
             using (connection)
             {
                 connection.Open();
-                string query = @"SELECT [Measures].[Computation] on 0,
+                const string query = @"SELECT [Measures].[Computation] on 0,
                                 [Unit].[Unit].&[Toledo Store] on 1
                                 FROM [CUBE]";
 
-                using (MdxCommand command = connection.CreateCommand())
+                using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    MdxDataAdapter dataAdapter = new MdxDataAdapter();
-                    dataAdapter.SelectCommand = command;
+                    var dataAdapter = new MdxDataAdapter {SelectCommand = command};
                     dataAdapter.Fill(dataSet);
                 }
 
@@ -175,25 +161,25 @@ namespace Test
             }
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void DataTableTest()
         {
-            DataTable dataTable = new DataTable();
+            var dataTable = new DataTable();
 
-            MdxConnection connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCeCubeConnection();
             using (connection)
             {
                 connection.Open();
-                string query = @"SELECT [Measures].[Computation] on 0,
+                const string query = @"SELECT [Measures].[Computation] on 0,
                                 [Unit].[Unit].&[Toledo Store] on 1
                                 FROM [CUBE]";
 
-                using (MdxCommand command = connection.CreateCommand())
+                using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
                     command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
                     command.Parameters.Add(new MdxParameter("~[Unit].[Unit].[Unit]", "Store"));
-                    using (MdxDataAdapter dataAdapter = new MdxDataAdapter())
+                    using (var dataAdapter = new MdxDataAdapter())
                     {
                         dataAdapter.SelectCommand = command;
                         dataAdapter.Fill(dataTable);
@@ -213,10 +199,10 @@ namespace Test
         [TestMethod]
         public void ParmTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCeCubeConnection())
             {
                 connection.Open();
-                string query = @"WITH 
+                const string query = @"WITH 
 
                         MEMBER [Measures].[Employee Value] AS
                         [Employee].[Employee Full Name].currentmember.uniquename
@@ -233,11 +219,11 @@ namespace Test
                            [Report Period].[Report Period Type].&[12 Month]        
                        )";
 
-                DynamicParameters parms = new DynamicParameters();
+                var parms = new DynamicParameters();
                 parms.Add("@ReportPeriod", "[Report Period].[Report Period Name].&[Dec-10]");
                 parms.Add("~[Measures].[Computation]", "score");
 
-                var x = connection.Query(query, parms);
+                var x = connection.Query(query, parms).ToList();
                 Assert.IsNotNull(x.First().score);
                 Assert.AreEqual(28, x.Count());
 
@@ -247,10 +233,10 @@ namespace Test
         [TestMethod]
         public void NoResultsTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCeCubeConnection())
             {
                 connection.Open();
-                string query = @"WITH 
+                const string query = @"WITH 
 
                         MEMBER [Measures].[Employee Value] AS
                         [Employee].[Employee Full Name].currentmember.uniquename
@@ -276,10 +262,10 @@ namespace Test
         [TestMethod]
         public void ColumnMappingOrdinalOnlyTest()
         {
-            using(MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
+            using(var connection = UnitTestHelpers.GetCeCubeConnection())
             {
                 connection.Open();
-                string query = @"SELECT {[Measures].[Computation]} on 0,
+                const string query = @"SELECT {[Measures].[Computation]} on 0,
                         ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
                         FROM [CUBE]
                         where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
@@ -287,7 +273,7 @@ namespace Test
                        [Report Period].[Report Period Name].&[Dec-10],
                            [Report Period].[Report Period Type].&[Month]        
                        )";
-                DynamicParameters parms = new DynamicParameters();
+                var parms = new DynamicParameters();
                 parms.Add("~0", "label");
                 parms.Add("~2", "score");
 
@@ -302,10 +288,10 @@ namespace Test
         [TestMethod]
         public void ColumnMappingMixingTildaAndOrdinalTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCeCubeConnection())
             {
                 connection.Open();
-                string query = @"SELECT {[Measures].[Computation]} on 0,
+                const string query = @"SELECT {[Measures].[Computation]} on 0,
                         ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
                         FROM [CUBE]
                         where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
@@ -313,7 +299,7 @@ namespace Test
                        [Report Period].[Report Period Name].&[Dec-10],
                            [Report Period].[Report Period Type].&[3 Month]        
                        )";
-                DynamicParameters parms = new DynamicParameters();
+                var parms = new DynamicParameters();
                 parms.Add("~0", "label");
                 parms.Add("~[Measures].[Computation]", "score");
 
@@ -324,47 +310,18 @@ namespace Test
                 Assert.AreEqual("Barbara Suiter", specificItem.Label, "label");
             }
         }
-
-        [TestMethod]
-        public void ColumnMappingOrdinalOverrideTest()
-        {
-            using (MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
-            {
-                connection.Open();
-                string query = @"SELECT {[Measures].[Computation]} on 0,
-                        ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
-                        FROM [CUBE]
-                        where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
-                       [Computation].[Computation Name].&[Mean],              
-                       [Report Period].[Report Period Name].&[Dec-10],
-                           [Report Period].[Report Period Type].&[12 Month]        
-                       )";
-                DynamicParameters parms = new DynamicParameters();
-                parms.Add("~[Employee].[Employee Full Name].[Employee Full Name]", "label");
-                parms.Add("~[Measures].[Computation]", "score");
-                parms.Add("~0", "OverrideLabel");
-
-
-                var x = connection.Query<StandardScore>(query, parms).ToList();                
-                Assert.AreEqual(28, x.Count, "item count");
-                var specificItem = x.First();
-                Assert.AreEqual(67, specificItem.Score);
-                Assert.AreEqual("Barbara Suiter", specificItem.OverrideLabel, "override label");
-                Assert.IsNull(specificItem.Label);
-            }
-        }
-
+        
         [TestMethod]
         public void ExecuteScalarTest()
         {
             object scalar;
-            using (MdxConnection connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCeCubeConnection())
             {
                 connection.Open();
-                string query = @"SELECT [Measures].[Computation] on 0,
+                const string query = @"SELECT [Measures].[Computation] on 0,
                                 [Unit].[Unit].&[Toledo Store] on 1
                                 FROM [CUBE]";
-                using (MdxCommand command = connection.CreateCommand())
+                using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
                     command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
@@ -378,10 +335,10 @@ namespace Test
         [TestMethod]
         public void SettingDataTypeTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                string query = @"WITH 
+                const string query = @"WITH 
                             MEMBER DisplayScore AS
                             [Measures].[Response Computation]
 
@@ -412,11 +369,12 @@ namespace Test
                                        [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Repurchase]
                                       )    ";
 
-                DynamicParameters dp = new DynamicParameters();
+                var dp = new DynamicParameters();
                 dp.Add("~0", "Label");
                 dp.Add("~[Measures].[DisplayScore]", "Score", DbType.Double);
                 dp.Add("~[Measures].[Response Computation]", "RawScore", DbType.Double);
                 var actual = connection.Query<Metric>(query,dp).SingleOrDefault();
+                Assert.IsNotNull(actual);
                 Assert.AreEqual("77.2727272727273", actual.Score.ToString());
                 Assert.AreEqual("{2B10EE84-084E-1EEE-63C5-D54007BAF192}", actual.Label);
                 Assert.AreEqual("77.2727272727273", actual.RawScore.ToString());
@@ -426,9 +384,9 @@ namespace Test
         [TestMethod]
         public void GermanMetricTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             { 
-                string query = @"WITH 
+                const string query = @"WITH 
                                                             MEMBER DisplayScore AS
                                                             ROUND([Measures].[Response Computation], 0)
 
@@ -463,7 +421,7 @@ namespace Test
                                                             MAX(EntitiesWithScores, [Rank])
 
                                                             MEMBER ComparatorScore AS
-                                                                                    ([Organization].[Organization].&[7], DisplayScore)
+                                                            ([Organization].[Organization].&[356].parent, DisplayScore)
 
                                                             MEMBER Range1 AS
                                                             IIF([Type] = 'Category', ([Organization].[Organization].currentmember.datamember, [Measures].[Organization Question Category Threshold Low Score]), ([Organization].[Organization].currentmember.datamember, [Measures].[Organization Question Threshold Low Score]))
@@ -475,17 +433,17 @@ namespace Test
                                                             IIF([Type] = 'Category', ([Organization].[Organization].currentmember.datamember, [Measures].[Organization Question Category Threshold Maximum Score]), ([Organization].[Organization].currentmember.datamember, [Measures].[Organization Question Threshold Maximum Score]))
 
                                                             SELECT {[Measures].[Label], DisplayScore, [Rank], MaxRank, [Measures].[MdxValue], [Measures].[SqlValue], [Measures].[Response Computation], [Measures].[Response Count], ParentLabel, ParentMdxValue, Range1, Range2, Range3 , [Measures].[ComparatorScore] } on 0,
-                                                            ([Organization].[Organization].&[71], [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question Category]) on 1
+                                                            ([Organization].[Organization].&[356], [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question Category]) on 1
                                                             FROM [Report]
                                                             WHERE (
                                                                        [Questionnaire].[Response Value Type].&[code],
                                                                        [Computation].[Computation].&[Mean], 
-                                                                       [Organization].[Organization Hierarchy Name].&[Hierarchy 1],
-                                                                       [Report Period].[Report Period].&[December 2010],
+                                                                       [Organization].[Organization Hierarchy Name].&[Sales Demo],
+                                                                       [Report Period].[Report Period].&[November 2012],
                                                                        [Report Period].[Report Period Type].&[3 Month Roll]
                                                                       )   ";
                 connection.Open();
-                DynamicParameters parms = new DynamicParameters();
+                var parms = new DynamicParameters();
                 parms.Add("~2", "Label");
                 parms.Add("~3", "Score");
                 parms.Add("~8", "RawScore");
@@ -493,12 +451,11 @@ namespace Test
                 parms.Add("~13", "Range2");
                 parms.Add("~14", "Range3");
                 parms.Add("~15", "ComparatorScore");
-
                 System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
 
                 var scores = connection.Query<Metric>(query, parms);
-                var y = scores.Count();
+                Assert.IsTrue(scores.Any());
                 
             }
 
@@ -510,10 +467,10 @@ namespace Test
         [TestMethod]
         public void ExtraColumnsTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                string query = @"WITH 
+                const string query = @"WITH 
                                 MEMBER DisplayScore AS
                                 ROUND([Measures].[Response Computation], 0)
 
@@ -560,16 +517,17 @@ namespace Test
 	                                    [Report Period].[Report Period].&[November 2012],
 	                                    [Report Period].[Report Period Type].&[3 Month Roll]
 	                                    )";
-                DynamicParameters parms = new DynamicParameters();
+                var parms = new DynamicParameters();
                 parms.Add("~1", "Label");
                 parms.Add("~1##UniqueName##", "MdxValue");
                 parms.Add("~[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question]##UniqueName##", "SqlValue");
                 parms.Add("~2", "score");
 
-                var x = connection.Query<Metric>(query, parms);
+                var x = connection.Query<Metric>(query, parms).ToList();
                 
                 Assert.AreEqual(23, x.Count(), "item count");
-                var specificItem = x.Where(a => a.Label == "Product knowledge").SingleOrDefault();
+                var specificItem = x.SingleOrDefault(a => a.Label == "Product knowledge");
+                Assert.IsNotNull(specificItem);
                 Assert.AreEqual(76, specificItem.Score, "score");
                 Assert.AreEqual("Product knowledge", specificItem.Label, "label");
                 Assert.AreEqual("[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q4]", specificItem.MdxValue, "mdx value");
@@ -581,10 +539,10 @@ namespace Test
         [TestMethod]
         public void ColumnOnlyNullsOnEndTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                string query = @"WITH
+                const string query = @"WITH
                 MEMBER O AS 
                 IIF([Measures].[Open] = NULL, 0, [Measures].[Open])
 
@@ -602,7 +560,7 @@ namespace Test
                 ,[Questionnaire].[Questionnaire Version - Questionnaire - Question Category].[Questionnaire].&[1]&[1]
                 )";
 
-                DynamicParameters dp = new DynamicParameters();
+                var dp = new DynamicParameters();
                 dp.Add("~[Measures].[O]", "Open");
                 dp.Add("~[Measures].[New]", "New");
                 dp.Add("~[Measures].[C]", "Closed");
@@ -616,10 +574,10 @@ namespace Test
         [TestMethod]
         public void ColumnOnlyTest()
         {
-            using (MdxConnection connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                string query = @"WITH
+                const string query = @"WITH
                 
                 MEMBER New AS
                 [Measures].[Collection Alert Distinct Count] - [Measures].[Open] - [Measures].[Closed]
@@ -632,7 +590,7 @@ namespace Test
                 ,[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Questionnaire].&[SalesDemo]&[2]
                 )";
 
-                DynamicParameters dp = new DynamicParameters();
+                var dp = new DynamicParameters();
                 dp.Add("~[Measures].[O]", "Open");
                 dp.Add("~[Measures].[New]", "New");
                 dp.Add("~[Measures].[C]", "Closed");
@@ -640,6 +598,85 @@ namespace Test
 
                 var result = connection.Query<AlertState>(query, dp);
                 Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void OrdnialErrorTest()
+        {
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            {
+                connection.Open();
+                const string query = @"WITH 
+							MEMBER DisplayScore AS
+							ROUND([Measures].[Response Computation], 0)
+
+							MEMBER CalcScore AS
+							ROUND([Measures].[Response Computation], 0)
+
+							SET EntitiesWithScores AS
+							NONEMPTY([Organization].[Organization].&[407].siblings,[Measures].[Response Count])
+
+							MEMBER [Type] AS
+							IIF([Questionnaire].[Question Id].currentmember is [Questionnaire].[Question Id].[All], 'Category', 'Question')							
+						   
+							MEMBER SqlValue AS
+							IIF([Type] = 'Category',[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].currentmember.name, [Questionnaire].[Question Id].currentmember.name)
+
+							MEMBER ParentMdxValue AS
+							IIF([Type] = 'Category', null, [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].currentmember.parent.uniquename)
+						   
+							MEMBER ParentLabel AS
+							IIF([Type] = 'Category', NULL, [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].currentmember.member_caption)                            
+
+							MEMBER [Rank] AS
+							RANK([Organization].[Organization].currentmember, EntitiesWithScores, DisplayScore)
+
+							MEMBER MaxRank AS
+							MAX(EntitiesWithScores, [Rank])
+
+							MEMBER ComparatorScore AS
+										([Organization].[Organization].&[61], DisplayScore)
+
+							MEMBER Range1 AS
+							IIF([Type] = 'Category', ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Category Threshold Low Score]), ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Threshold Low Score]))
+
+							MEMBER Range2 AS
+							IIF([Type] = 'Category', ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Category Threshold High Score]), ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Threshold High Score]))
+
+							MEMBER Range3 AS
+							IIF([Type] = 'Category', ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Category Threshold Maximum Score]), ([Organization].[Organization].currentmember.datamember,[Measures].[Organization Question Threshold Maximum Score]))
+
+							SELECT {DisplayScore, [Rank], MaxRank, [Measures].[SqlValue], [Measures].[Response Computation], [Measures].[Response Count], ParentLabel, ParentMdxValue, Range1, Range2, Range3 ,[Measures].[ComparatorScore] } on 0,
+							([Organization].[Organization].&[407], [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[oa]) on 1
+							FROM [Report]
+							WHERE (
+								   [Questionnaire].[Response Value Type].&[code],
+								   [Computation].[Computation].&[Mean], 
+								   [Organization].[Organization Hierarchy Name].&[Sales Demo],
+								   [Report Period].[Report Period].&[November 2012],
+								   [Report Period].[Report Period Type].&[3 Month Roll]
+								  )";
+                var parameters = new DynamicParameters();
+                parameters.Add("~1", "Label");
+				parameters.Add("~[Measures].[DisplayScore]", "Score");
+				parameters.Add("~[Measures].[Rank]", "Rank");
+                parameters.Add("~[Measures].[MaxRank]", "MaxRank");
+                parameters.Add("~1##UniqueName##", "MdxValue");
+				parameters.Add("~[Measures].[SqlValue]", "SqlValue");
+				parameters.Add("~[Measures].[Response Computation]", "RawScore");
+				parameters.Add("~[Measures].[Response Count]", "Count");
+				parameters.Add("~[Measures].[ParentLabel]", "ParentLabel");
+				parameters.Add("~[Measures].[ParentMdxValue]", "ParentMdxValue");
+				parameters.Add("~[Measures].[Range1]", "Range1");
+				parameters.Add("~[Measures].[Range2]", "Range2");
+				parameters.Add("~[Measures].[Range3]", "Range3");
+                parameters.Add("~[Measures].[ComparatorScore]", "ComparatorScore");
+
+                var actual = connection.Query<Metric>(query, parameters);
+
+                Assert.IsNotNull(actual);
+                Assert.AreEqual(1, actual.Count());
             }
         }
 

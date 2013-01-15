@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
 using System.Runtime.Serialization;
 
 namespace MdxClient
 {
-    [Serializable()]
+    [Serializable]
     internal class Column : ISerializable
     {
 
         public string Name { get; set; }
         public List<string> Items { get; set; }
         public Type Type { get; set; }
-        public int Ordinal { get; set; }
+        public int CellOrdinal { get; set; }
+        public int ColumnOrdinal { get; set; }
 
         public Column()
         {

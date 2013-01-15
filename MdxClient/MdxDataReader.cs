@@ -392,7 +392,7 @@ namespace MdxClient
             {
                 DataRow dataRow = dataTable.NewRow();
                 dataRow["ColumnName"] = column.Name;
-                dataRow["ColumnOrdinal"] = column.Ordinal;
+                dataRow["ColumnOrdinal"] = column.CellOrdinal;
                 dataRow["ColumnSize"] = 0;
                 if (column.Type == typeof(decimal))
                 {

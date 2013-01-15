@@ -19,12 +19,12 @@ namespace MdxClient
 
         #region private variables
         
-        private AdomdCommand _command;
+        private readonly AdomdCommand _command;
         private MdxConnection _connection;
         private MdxTransaction _transaction;
         private MdxParameterCollection _parameters;
-        private XNamespace _namespace = "urn:schemas-microsoft-com:xml-analysis:mddataset";
-        private XNamespace _xsiNs = "http://www.w3.org/2001/XMLSchema-instance";
+        private readonly XNamespace _namespace = "urn:schemas-microsoft-com:xml-analysis:mddataset";
+        private readonly XNamespace _xsiNs = "http://www.w3.org/2001/XMLSchema-instance";
         private IEnumerable<ColumnMap> _columnMap;
         #endregion
 
@@ -143,15 +143,7 @@ namespace MdxClient
 
         protected override DbParameterCollection DbParameterCollection
         {
-            get
-            {
-                if (_parameters == null)
-                {
-                    _parameters = new MdxParameterCollection();
-                }
-
-                return _parameters;
-            }
+            get { return _parameters ?? (_parameters = new MdxParameterCollection()); }
         }
                 
         protected override DbTransaction DbTransaction
@@ -183,7 +175,7 @@ namespace MdxClient
             }
             set
             {
-                if (value == true)
+                if (value)
                     throw new ArgumentException("", "value");
             }
         }
@@ -198,7 +190,7 @@ namespace MdxClient
 
             var parameters = allParameters.Except(_columnMap, new ColumnMapComparer());
 
-            foreach (ColumnMap parameter in parameters)
+            foreach (var parameter in parameters)
             {
                 // dapper 1.7+ rips off the @, this allows for either @ or no prefix to be found and replaced
                 var name = parameter.Name.StartsWith(ColumnMap.Parameter, StringComparison.OrdinalIgnoreCase) ? parameter.Name : ColumnMap.Parameter + parameter.Name;
@@ -209,16 +201,9 @@ namespace MdxClient
             var trace = new System.Diagnostics.TraceSource("mdx");
             trace.TraceData(System.Diagnostics.TraceEventType.Information, 0, _command.CommandText);
 
-            ResultSet results = PopulateFromXml(_command.ExecuteXmlReader());
+            var results = PopulateFromXml(_command.ExecuteXmlReader());
 
-            if (behavior == CommandBehavior.CloseConnection)
-            {
-                return new MdxDataReader(results, _connection);
-            }
-            else
-            {
-                return new MdxDataReader(results);
-            }
+            return behavior == CommandBehavior.CloseConnection ? new MdxDataReader(results, _connection) : new MdxDataReader(results);
         }
 
         public override int ExecuteNonQuery()
@@ -233,7 +218,7 @@ namespace MdxClient
         public override object ExecuteScalar()
         {
             object result = null;
-            using (DbDataReader ds = base.ExecuteReader())
+            using (var ds = ExecuteReader())
             {
                 if (ds.Read() && ds.FieldCount > 0)
                 {
@@ -280,21 +265,21 @@ namespace MdxClient
 
         private ResultSet PopulateFromXml(XmlReader xmlReader)
         {
-            ResultSet crs = new ResultSet();
+            var crs = new ResultSet();
 
             using (xmlReader)
             {
-                XDocument doc = XDocument.Load(xmlReader);
+                var doc = XDocument.Load(xmlReader);
 
-                List<Tuple> axis = GetAxis(doc);
+                var axis = GetAxis(doc);
                 var rows = axis.Where(a => a.Axis == "Axis1");
                 var columns = axis.Where(a => a.Axis == "Axis0");
                 var cells = GetCellData(doc);
 
-                int rowColumnCount = AddColumnsFromRowAxis(rows, crs);
+                var rowColumnCount = AddColumnsFromRowAxis(rows, crs);
                 AddColumnsFromColumnAxis(columns, cells, crs);
 
-                processOrdinalColumns(crs);
+                ProcessOrdinalColumns(crs);
 
                 AddRows(rows, cells, rowColumnCount, crs);
             }
@@ -302,17 +287,15 @@ namespace MdxClient
             return crs;
         }
 
-        private void processOrdinalColumns(ResultSet crs)
+        private void ProcessOrdinalColumns(ResultSet crs)
         {
             foreach (var column in _columnMap)
             {
                 int ordinal;
-                if (Int32.TryParse(column.NameWithoutPrefixes, out ordinal))
+                if (!Int32.TryParse(column.NameWithoutPrefixes, out ordinal)) continue;
+                if (ordinal >= 0 && ordinal < crs.Columns.Count)
                 {
-                    if (ordinal >= 0 && ordinal < crs.Columns.Count)
-                    {
-                        crs.Columns[ordinal].Name = column.Value.ToString();
-                    }
+                    crs.Columns[ordinal].Name = column.Value.ToString();
                 }
             }
         }
@@ -343,16 +326,11 @@ namespace MdxClient
 
             return x.ToList();
 
-        }       
-
-        private void SetColumnNameAndType(Column column, string defalutName)
-        {
-            SetColumnNameAndType(column, defalutName, null);
         }
 
-        private void SetColumnNameAndType(Column column, string defaultName, Type defalutType)
+        private void SetColumnNameAndType(Column column, string defaultName, Type defalutType = null)
         {            
-            ColumnMap cm = GetColumnMap(defaultName);
+            var cm = GetColumnMap(column, defaultName);
 
             if (null != cm)
             {
@@ -371,29 +349,21 @@ namespace MdxClient
 
         private static Type GetTypeFromDbType(DbType? dbType)
         {
-            if (null == dbType)
-            {
-                return typeof(string);
-            }
-            else
-            {
-                return TypeConverter.ToNetType(dbType.Value);
-            }
+            return null == dbType ? typeof(string) : TypeConverter.ToNetType(dbType.Value);
         }
 
         private int AddColumnsFromRowAxis(IEnumerable<Tuple> rows, ResultSet crs)
         {
-            int columnCount = 0;
+            var columnCount = 0;
             if (null != rows && rows.Any())
             {
                 foreach (var member in rows.First().Members)
                 {
-                    Column column = new Column();
+                    var column = new Column {ColumnOrdinal = columnCount++};
                     SetColumnNameAndType(column, member.LevelName, typeof(string));                    
-
                     column.Items.Add(column.Name);                   
                     crs.Columns.Add(column);
-                    columnCount++;
+                    
                 }
 
                 foreach (var extraColumn in (from x in rows
@@ -405,12 +375,10 @@ namespace MdxClient
                                                  ChildColumn = z.UniqueName
                                              }).Distinct())
                 {
-                    Column column = new Column();
+                    var column = new Column { ColumnOrdinal = columnCount++ };
                     SetColumnNameAndType(column, extraColumn.ChildColumn, typeof(string));
-                    
                     crs.Columns.Add(column);
                     column.Items.Add(column.Name);
-                    columnCount++;
                 }
             }
 
@@ -434,11 +402,12 @@ namespace MdxClient
 
         private void AddColumnsFromColumnAxis(IEnumerable<Tuple> columns, IEnumerable<Cell> cells, ResultSet crs)
         {            
-            int columnCount = 0;
+            var cellOrdinal = 0;
+            var columnOrdinal = crs.Columns.Count;
             foreach (var tuple in columns)
             {
-                StringBuilder sb = new StringBuilder();
-                Column column = new Column();
+                var sb = new StringBuilder();
+                var column = new Column();
 
                 foreach (var member in tuple.Members)
                 {
@@ -446,41 +415,41 @@ namespace MdxClient
                     column.Items.Add(member.Caption);
                 }
 
+                column.CellOrdinal = ++cellOrdinal;
+                column.ColumnOrdinal = columnOrdinal++;
                 SetColumnNameAndType(column, sb.ToString());                
-                column.Ordinal = ++columnCount;
                 crs.Columns.Add(column);                            
             }
             
             // this is done after all the columns are added because we need to know the total column count for any of the modus math to work correctly
             // at least any of the modulus math i could think of so far :)
-            crs.Columns.Where(a => a.Type == null).ToList().ForEach(a => a.Type = GetTypeForColumn(cells, a, columnCount));
+            crs.Columns.Where(a => a.Type == null).ToList().ForEach(a => a.Type = GetTypeForColumn(cells, a, cellOrdinal));
         }
 
         private Type GetTypeForColumn(IEnumerable<Cell> cells, Column column, int columnCount)
         {
-            Type type = typeof(string);
-            // first column is always from the row axis, make it string
-            if (column.Ordinal == 0)
+            var type = typeof(string);
+            // all columns from row axis, make it string
+            if (column.CellOrdinal == 0)
             {
                 return type;
             }
 
-            // If the user passed in a dbtape as part of the parms, use that
-            var columnMap = GetColumnMapFromOrdinalOrName(column);
+            // If the user passed in a dbtype as part of the parms, use that
+            var columnMap = GetColumnMap(column);
             if (null != columnMap && null != columnMap.Type)
             {
                 return  GetTypeFromDbType(columnMap.Type);
             }
-            
 
-            int columnPosition = column.Ordinal;
-            if (column.Ordinal == columnCount)
+            var columnPosition = column.CellOrdinal;
+            if (column.CellOrdinal == columnCount)
             {
                 columnPosition = 0;
             }
             // using the ordinal of the cell along with the column count we can determine which column a cell belongs too.
             // this gets all the cells for the current column and gets the distinct types
-            var x = cells.Where(c => ((c.Ordinal + 1) % columnCount) == columnPosition).Select(t => t.Type).Distinct();
+            var x = cells.Where(c => ((c.Ordinal + 1) % columnCount) == columnPosition).Select(t => t.Type).Distinct().ToList();
             
             if (x.Count() > 1)
             {
@@ -490,14 +459,7 @@ namespace MdxClient
                 if ( !x.Contains(null) )
                 {
                     // mix of numbers not doubles, default to int
-                    if (!x.Contains("xsd:double"))
-                    {
-                        type = typeof(int);
-                    }
-                    else
-                    {
-                        type = typeof(double);
-                    }
+                    type = !x.Contains("xsd:double") ? typeof(int) : typeof(double);
                 }
                 else
                 {
@@ -518,7 +480,7 @@ namespace MdxClient
 
         private static Type ConvertXmlTypeToType(string type)
         {
-            Type t = typeof(string);
+            Type t;
 
             switch (type)
             {
@@ -551,21 +513,6 @@ namespace MdxClient
             return t;
         }               
 
-        private static int convertIt(string item)
-        {
-            int value = -1;
-            if (int.TryParse(item, out value))
-            {
-
-            }
-            return value;
-        }
-
-        private ColumnMap GetColumnMapFromOrdinalOrName(Column c)
-        {
-            return _columnMap.Where(a => convertIt(a.NameWithoutPrefixes) == c.Ordinal || a.Value.ToString() == c.Name).SingleOrDefault();
-        }
-
         private static void AdjustValueFromColumnType(Cell cell, int columnIndex, ResultSet crs)
         {
             // change type was giving odd results when a culture was passed in on the thread, for example German 5.324145E1 came out as 5324145 instead of 53.24145
@@ -576,15 +523,15 @@ namespace MdxClient
         private void AddRows(IEnumerable<Tuple> rows, List<Cell> cells, int rowColumnCount, ResultSet crs)
         {
 
-            int start = 0;
-            int columnCountFromColumnAxis = crs.Columns.Count - rowColumnCount;
-            int finish = columnCountFromColumnAxis - 1;
+            var start = 0;
+            var columnCountFromColumnAxis = crs.Columns.Count - rowColumnCount;
+            var finish = columnCountFromColumnAxis - 1;
             
-            int cellsIndexer = 0;
-            int cellsCount = cells.Count();
-            int ordinal = 0;
+            var cellsIndexer = 0;
+            var cellsCount = cells.Count();
+            var ordinal = 0;
 
-            if (0 == rows.Count() && cells.Count > 0)
+            if (!rows.Any() && cells.Count > 0)
             {
                 // data coming back from the cube only has cell for actual data, nulls are not represented.  We need to fill in those cells so that the data appears
                 // in the correct columns
@@ -607,11 +554,9 @@ namespace MdxClient
 
                 foreach (var row in rows)
                 {
-                    Row r = new Row();
-                    foreach (var member in row.Members)
+                    var r = new Row();
+                    foreach (var c in row.Members.Select(member => new Cell() { FormattedValue = member.Caption, Value = member.Caption, Ordinal = ordinal++ }))
                     {
-                        Cell c = new Cell() { FormattedValue = member.Caption, Value = member.Caption, Ordinal = ordinal++ };
-
                         // TODO: Logic for dimension property
                         r.Cells.Add(c);
                     }
@@ -619,9 +564,9 @@ namespace MdxClient
                     //ordinal = GetOrdinalForCell(rowIndex++, rowColumnCount, crs.Columns.Count, rowColumnCount);
 
                     // cells are in a single dimension array, have to determine which row it belongs to to intermix the row data correctly
-                    for (int i = start; i <= finish; i++)
+                    for (var i = start; i <= finish; i++)
                     {
-                        Cell cellToAdd = new Cell();
+                        var cellToAdd = new Cell();
 
                         // cell indexer can go past its range, only try to get values while in range
                         if (!(cellsIndexer >= cellsCount))
@@ -646,9 +591,9 @@ namespace MdxClient
                     // if we tried to adding the cells in the for above, it would through the ordinals off for all cells.
                     if (columnsAdded > 0)
                     {
-                        for (int i = 0; i < row.Members.Count; i++ )
+                        for (var i = 0; i < row.Members.Count; i++ )
                         {
-                            int previousCount = r.Cells.Count;
+                            var previousCount = r.Cells.Count;
                             r.Cells.AddRange(AddCellsFromMemberProperties(memberProperties, row.Members[i], ordinal, i));
                             if (previousCount != r.Cells.Count)
                             {
@@ -688,16 +633,29 @@ namespace MdxClient
         /// <param name="columnMap"></param>
         private static void AddColumnsFromRowProperties(ResultSet crs, IEnumerable<ColumnMap> columnMap)
         {
-            var max = crs.Columns.Select(a => a.Ordinal).Max();
+            var max = crs.Columns.Select(a => a.CellOrdinal).Max();
             foreach(var map in columnMap)
             {
-                crs.Columns.Add(new Column() { Ordinal = ++max, Name = map.Value.ToString(), Type = typeof(string) });
+                crs.Columns.Add(new Column() { CellOrdinal = ++max, Name = map.Value.ToString(), Type = typeof(string) });
             }
         }                
 
-        private ColumnMap GetColumnMap(string nameFromMdx)
-        {            
-            return _columnMap.Where(a => a.NameWithoutPrefixes == nameFromMdx).SingleOrDefault();
+       private static int ConvertIt(string item)
+       {
+           int value;
+           if (int.TryParse(item, out value))
+           {
+               return value;
+           }
+           return -1;
+        }
+
+        private ColumnMap GetColumnMap(Column column, string columnName = null)
+        {
+            var name = columnName ?? column.Name;
+            return _columnMap.SingleOrDefault(a => string.Equals(a.NameWithoutPrefixes, name) ||
+                                                   string.Equals(a.Value.ToString(), name) || 
+                                                   ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
         }
 
         protected override void Dispose(bool disposing)
