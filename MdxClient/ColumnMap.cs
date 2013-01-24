@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Data;
 
 namespace MdxClient
@@ -13,6 +12,7 @@ namespace MdxClient
         public const string CaptionToken = "##Caption##";
         public const string LevelNameToken = "##LevelName##";
         public const string UniqueNameToken = "##UniqueName##";
+        public const string LevelNumberToken = "##LevelNumber##";
         public string Name { get; set; }
         public object Value { get; set; }
         public DbType? Type { get; set; }
@@ -32,19 +32,30 @@ namespace MdxClient
             {
                 return NameWithoutPrefixes.Replace(CaptionToken, "")
                                           .Replace(LevelNameToken, "")
-                                          .Replace(UniqueNameToken, "");
+                                          .Replace(UniqueNameToken, "")
+                                          .Replace(LevelNumberToken, "");
             }
         }
 
+        public bool IsLevelName { get { return IsTokenName(LevelNumberToken); } }
+        public bool IsUniqueName { get { return IsTokenName(UniqueNameToken); } }
+        public bool IsCaption { get { return IsTokenName(CaptionToken); } }
+        public bool IsLevelNumber { get { return IsTokenName(LevelNumberToken); } }
+
+        private bool IsTokenName(string token)
+        {
+            return Name.EndsWith(token, StringComparison.OrdinalIgnoreCase);
+        }
     }       
 
     internal static class ColumnMapExtentions
     {
         internal static IEnumerable<ColumnMap> GetMemberProperties(this IEnumerable<ColumnMap> maps)
         {
-            return maps.Where(a => a.Name.EndsWith(ColumnMap.LevelNameToken, StringComparison.OrdinalIgnoreCase) ||
-                                   a.Name.EndsWith(ColumnMap.UniqueNameToken, StringComparison.OrdinalIgnoreCase) ||
-                                   a.Name.EndsWith(ColumnMap.CaptionToken, StringComparison.OrdinalIgnoreCase));
+            return maps.Where(a => a.IsLevelName ||
+                                   a.IsUniqueName ||
+                                   a.IsCaption ||
+                                   a.IsLevelName);
         }
 
         internal static string GetMemberProperty(this ColumnMap map, Member member)
@@ -53,13 +64,17 @@ namespace MdxClient
             {
                 return member.Caption;
             }
-            else if (map.Name.EndsWith(ColumnMap.LevelNameToken, StringComparison.OrdinalIgnoreCase))
+            if (map.Name.EndsWith(ColumnMap.LevelNameToken, StringComparison.OrdinalIgnoreCase))
             {
                 return member.LevelName;
             }
-            else if (map.Name.EndsWith(ColumnMap.UniqueNameToken, StringComparison.OrdinalIgnoreCase))
+            if (map.Name.EndsWith(ColumnMap.UniqueNameToken, StringComparison.OrdinalIgnoreCase))
             {
                 return member.UniqueName;
+            }
+            if (map.Name.EndsWith(ColumnMap.LevelNumberToken, StringComparison.OrdinalIgnoreCase))
+            {
+                return member.LevelNumber;
             }
 
             return null;
@@ -83,10 +98,10 @@ namespace MdxClient
         public bool Equals(ColumnMap x, ColumnMap y)
         {
             //Check whether the compared objects reference the same data.
-            if (Object.ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, y)) return true;
 
             //Check whether any of the compared objects is null.
-            if (Object.ReferenceEquals(x, null) || Object.ReferenceEquals(y, null))
+            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
             return false;
 
             //Check whether the products' properties are equal.
@@ -96,7 +111,7 @@ namespace MdxClient
         public int GetHashCode(ColumnMap obj)
         {
             //Check whether the object is null
-            if (Object.ReferenceEquals(obj, null)) return 0;
+            if (ReferenceEquals(obj, null)) return 0;
 
             //Get hash code for the Name field if it is not null.
             return obj.Name == null ? 0 : obj.NameWithoutPrefixes.GetHashCode();

@@ -688,14 +688,10 @@ namespace DynamicTyped.Data.Test
             const string query =
             @"WITH 
 						
-
-MEMBER [Level] AS
-[Organization].[Organization].currentmember.level_number
-
 MEMBER ParentSqlValue AS
 [Organization].[Organization].currentmember.parent.Properties(""Organization Id"")
 
-SELECT {ParentSqlValue, [Level]} ON 0,
+SELECT {ParentSqlValue} ON 0,
 DESCENDANTS([Organization].[Organization].&[61], 5 , self_and_Before) dimension properties [Organization].[Organization].[Organization Id], Parent_UNique_name ON 1
 FROM Report
 WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
@@ -710,7 +706,8 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 parms.Add("~1", "SqlValue");
                 parms.Add("~2", "ParentMdxValue");
                 parms.Add("~3", "ParentSqlValue");
-                parms.Add("~4", "HierarchyLevel");
+                parms.Add("~0##LevelNumber##", "HierarchyLevel");
+             
 
                 var actual = connection.Query<Metric>(query, parms);
                 Assert.IsNotNull(actual);

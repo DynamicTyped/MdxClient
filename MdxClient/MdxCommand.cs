@@ -316,6 +316,7 @@ namespace MdxClient
                                Caption = member.Element(_namespace + "Caption").Value,
                                UniqueName = member.Element(_namespace + "UName").Value,
                                LevelName = member.Element(_namespace + "LName").Value,
+                               LevelNumber = member.Element(_namespace + "LNum").Value,
                                DimensionProperties = (from property in member.Elements()
                                                       where ! excludedDimensionProperties.Contains(property.Name.LocalName) 
                                                       //where property.Name.LocalName.StartsWith("_x005B_", StringComparison.OrdinalIgnoreCase)
@@ -630,16 +631,30 @@ namespace MdxClient
 
         private static IEnumerable<Cell> AddCellsFromMemberProperties(IEnumerable<ColumnMap> specialColumns, Member member, int cellOrdinal, int columnOrdinal)
         {
+            Func<ColumnMap, Cell> newCell = (map) =>
+                {
+                    object formattedValue = map.GetMemberProperty(member);
+                    var value = formattedValue;
+                    var type = "string";
+                    if (map.IsLevelNumber)
+                    {
+                        type = "xsd:int";
+                        value = Convert.ChangeType(formattedValue, typeof (int), CultureInfo.InvariantCulture);
+                    }
+                    var cell = new Cell()
+                        { 
+                            Ordinal = cellOrdinal++,
+                            FormattedValue = formattedValue,
+                            Type = type,
+                            Value = value
+                        };
+
+                    return cell;
+                };
+
             return specialColumns
                    .Where(a => a.DoesMapMatchMember(member, columnOrdinal))
-                   .Select(a => new Cell()
-                    {
-                        Ordinal = cellOrdinal++,
-                        FormattedValue = a.GetMemberProperty(member),
-                        //is there a good way not to run that code twice?
-                        Value = a.GetMemberProperty(member),
-                        Type = "string"
-                    });
+                   .Select(newCell);
         }       
 
         /// <summary>
@@ -652,7 +667,9 @@ namespace MdxClient
             var max = crs.Columns.Select(a => a.CellOrdinal).Max();
             foreach(var map in columnMap)
             {
-                crs.Columns.Add(new Column() { CellOrdinal = ++max, Name = map.Value.ToString(), Type = typeof(string) });
+                var type = map.IsLevelNumber ? typeof(int) : typeof (string);
+                
+                crs.Columns.Add(new Column() { CellOrdinal = ++max, Name = map.Value.ToString(), Type = type });
             }
         }                
 
