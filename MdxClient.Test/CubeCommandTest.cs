@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Diagnostics;
 using Dapper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MdxClient;
@@ -680,5 +682,46 @@ namespace DynamicTyped.Data.Test
             }
         }
 
+        [TestMethod]
+        public void DimensionPropertyTest()
+        {
+            const string query =
+            @"WITH 
+						
+
+MEMBER [Level] AS
+[Organization].[Organization].currentmember.level_number
+
+MEMBER ParentSqlValue AS
+[Organization].[Organization].currentmember.parent.Properties(""Organization Id"")
+
+SELECT {ParentSqlValue, [Level]} ON 0,
+DESCENDANTS([Organization].[Organization].&[61], 5 , self_and_Before) dimension properties [Organization].[Organization].[Organization Id], Parent_UNique_name ON 1
+FROM Report
+WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
+
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            {
+                connection.Open();
+                
+                var parms = new DynamicParameters();
+                parms.Add("~0", "Label");
+                parms.Add("~0##UniqueName##", "MdxValue");
+                parms.Add("~[Organization].[Organization].[Organization Id]", "SqlValue");
+                parms.Add("~PARENT_UNIQUE_NAME", "ParentMdxValue");
+                parms.Add("~[Measures].[ParentSqlValue]", "ParentSqlValue");
+                parms.Add("~[Measures].[Level]", "HierarchyLevel");
+
+                var actual = connection.Query<Metric>(query, parms);
+                Assert.IsNotNull(actual);
+                Assert.AreEqual(37, actual.Count());
+                var specificItem = actual.Single(a => string.Equals(a.Label, "Chicago (IL)", StringComparison.OrdinalIgnoreCase));
+                Assert.AreEqual("R11", specificItem.ParentSqlValue);
+                Assert.AreEqual("U401", specificItem.SqlValue);
+                Assert.AreEqual(4, specificItem.HierarchyLevel);
+                Assert.AreEqual("[Organization].[Organization].&[407]", specificItem.MdxValue);
+                Assert.AreEqual("[Organization].[Organization].&[61]", specificItem.ParentMdxValue);
+            }
+        }
     }
 }

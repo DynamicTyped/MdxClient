@@ -302,6 +302,8 @@ namespace MdxClient
 
         private List<Tuple> GetAxis(XDocument doc)
         {
+            var excludedDimensionProperties = new [] {  "UName", "Caption",  "LName",  "LNum",  "DisplayInfo" };
+            
             var x = from axis in doc.Root.Elements(_namespace + "Axes").Elements(_namespace + "Axis")
                     from tuple in axis.Elements(_namespace + "Tuples").Elements(_namespace + "Tuple")
                    select new Tuple()
@@ -315,10 +317,12 @@ namespace MdxClient
                                UniqueName = member.Element(_namespace + "UName").Value,
                                LevelName = member.Element(_namespace + "LName").Value,
                                DimensionProperties = (from property in member.Elements()
-                                                      where property.Name.LocalName.StartsWith("_x005B_", StringComparison.OrdinalIgnoreCase)
+                                                      where ! excludedDimensionProperties.Contains(property.Name.LocalName) 
+                                                      //where property.Name.LocalName.StartsWith("_x005B_", StringComparison.OrdinalIgnoreCase)
                                                       select new DimensionProperty()
                                                       {
-                                                          UniqueName = System.Xml.XmlConvert.DecodeName(property.Name.LocalName)
+                                                          UniqueName = System.Xml.XmlConvert.DecodeName(property.Name.LocalName),
+                                                          Value =  XmlConvert.DecodeName(property.Value)
                                                       }).ToList()
                            }
                        ).ToList()
@@ -366,7 +370,7 @@ namespace MdxClient
                     
                 }
 
-                foreach (var extraColumn in (from x in rows
+                foreach (var dimensionProperty in (from x in rows
                                              from y in x.Members
                                              from z in y.DimensionProperties
                                              select new
@@ -375,10 +379,16 @@ namespace MdxClient
                                                  ChildColumn = z.UniqueName
                                              }).Distinct())
                 {
-                    var column = new Column { ColumnOrdinal = columnCount++ };
-                    SetColumnNameAndType(column, extraColumn.ChildColumn, typeof(string));
-                    crs.Columns.Add(column);
-                    column.Items.Add(column.Name);
+                    var propertyColumn = new Column() {ColumnOrdinal = columnCount};
+                    SetColumnNameAndType(propertyColumn, dimensionProperty.ChildColumn, typeof(string));
+                    //only add column if not already added
+                    // each column can have a dimension property that may already be present
+                    if (!crs.Columns.Any(a => string.Equals(a.Name, propertyColumn.Name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        columnCount++;
+                        crs.Columns.Add(propertyColumn);
+                        propertyColumn.Items.Add(propertyColumn.Name);
+                    }
                 }
             }
 
@@ -555,14 +565,18 @@ namespace MdxClient
                 foreach (var row in rows)
                 {
                     var r = new Row();
-                    foreach (var c in row.Members.Select(member => new Cell() { FormattedValue = member.Caption, Value = member.Caption, Ordinal = ordinal++ }))
+                    foreach (var member in row.Members)
                     {
-                        // TODO: Logic for dimension property
-                        r.Cells.Add(c);
+                        r.Cells.Add(new Cell() { FormattedValue = member.Caption, Value = member.Caption, Ordinal = ordinal++ });
+                        if (member.DimensionProperties != null)
+                        {
+                            foreach (var property in member.DimensionProperties)
+                            {
+                                r.Cells.Add(new Cell() { FormattedValue = property.Value, Value = property.Value, Ordinal = ordinal++});
+                            }
+                        }
                     }
-
-                    //ordinal = GetOrdinalForCell(rowIndex++, rowColumnCount, crs.Columns.Count, rowColumnCount);
-
+                    
                     // cells are in a single dimension array, have to determine which row it belongs to to intermix the row data correctly
                     for (var i = start; i <= finish; i++)
                     {
