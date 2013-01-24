@@ -707,10 +707,10 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 var parms = new DynamicParameters();
                 parms.Add("~0", "Label");
                 parms.Add("~0##UniqueName##", "MdxValue");
-                parms.Add("~[Organization].[Organization].[Organization Id]", "SqlValue");
-                parms.Add("~PARENT_UNIQUE_NAME", "ParentMdxValue");
-                parms.Add("~[Measures].[ParentSqlValue]", "ParentSqlValue");
-                parms.Add("~[Measures].[Level]", "HierarchyLevel");
+                parms.Add("~1", "SqlValue");
+                parms.Add("~2", "ParentMdxValue");
+                parms.Add("~3", "ParentSqlValue");
+                parms.Add("~4", "HierarchyLevel");
 
                 var actual = connection.Query<Metric>(query, parms);
                 Assert.IsNotNull(actual);

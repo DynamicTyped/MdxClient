@@ -358,6 +358,7 @@ namespace MdxClient
 
         private int AddColumnsFromRowAxis(IEnumerable<Tuple> rows, ResultSet crs)
         {
+            var dimensionProperties = new List<string>();
             var columnCount = 0;
             if (null != rows && rows.Any())
             {
@@ -380,14 +381,15 @@ namespace MdxClient
                                              }).Distinct())
                 {
                     var propertyColumn = new Column() {ColumnOrdinal = columnCount};
-                    SetColumnNameAndType(propertyColumn, dimensionProperty.ChildColumn, typeof(string));
                     //only add column if not already added
                     // each column can have a dimension property that may already be present
-                    if (!crs.Columns.Any(a => string.Equals(a.Name, propertyColumn.Name, StringComparison.OrdinalIgnoreCase)))
+                    if (!dimensionProperties.Any(a => string.Equals(a, dimensionProperty.ChildColumn)))
                     {
+                        SetColumnNameAndType(propertyColumn, dimensionProperty.ChildColumn, typeof(string));
                         columnCount++;
                         crs.Columns.Add(propertyColumn);
                         propertyColumn.Items.Add(propertyColumn.Name);
+                        dimensionProperties.Add(dimensionProperty.ChildColumn);
                     }
                 }
             }
@@ -667,6 +669,11 @@ namespace MdxClient
         private ColumnMap GetColumnMap(Column column, string columnName = null)
         {
             var name = columnName ?? column.Name;
+#if DEBUG
+            var columMap = _columnMap.Where(a => string.Equals(a.NameWithoutPrefixes, name) ||
+                                                 string.Equals(a.Value.ToString(), name) ||
+                                                 ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
+#endif
             return _columnMap.SingleOrDefault(a => string.Equals(a.NameWithoutPrefixes, name) ||
                                                    string.Equals(a.Value.ToString(), name) || 
                                                    ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
