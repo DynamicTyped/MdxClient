@@ -9,17 +9,6 @@ namespace Test
 {
     public static class UnitTestHelpers
     {
-
-        public static string GetCeCubeConnecitonString()
-        {
-            return ConfigurationManager.ConnectionStrings["CE"].ConnectionString;
-        }
-
-        public static MdxConnection GetCeCubeConnection()
-        {
-            return new MdxConnection(GetCeCubeConnecitonString());
-        }
-
         public static string GetCapellaDataTestConnectionString()
         {
             return ConfigurationManager.ConnectionStrings["CapellaDataTest"].ConnectionString;

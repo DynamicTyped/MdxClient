@@ -57,22 +57,25 @@ namespace DynamicTyped.Data.Test
         [TestMethod]
         public void CustomParmsTest()
         {
-            var connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCapellaDataTestConnection();
             using (connection)
             {
                 connection.Open();
-                const string query = @"SELECT [Measures].[Computation] on 0,
-                                [Unit].[Unit].&[Toledo Store] on 1
-                                FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0,
+                                [Organization].[Organization].&[407] on 1
+                                FROM Report
+                                WHERE ([Computation].[Computation].&[Mean],
+                                       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2]
+                                        )";
 
                 var d = new DynamicParameters();
-                d.Add("~[Measures].[Computation]", "Score", DbType.Double);
+                d.Add("~[Measures].[Response Computation]", "Score", DbType.Double);
 
                 dynamic x = connection.Query(query, d);
 
                 foreach (var y in x)
-                {                    
-                    Assert.AreEqual(96, y.Score);
+                {
+                    Assert.AreEqual(64.6481481481482, y.Score, .00000001);
                     break;
                 }
             }
@@ -83,20 +86,23 @@ namespace DynamicTyped.Data.Test
         {
             var dataSet = new DataSet();
 
-            var connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCapellaDataTestConnection();
             using (connection)
             {
                 connection.Open();
-                const string query = @"SELECT [Measures].[Computation] on 0,
-                                [Unit].[Unit].&[Toledo Store] on 1
-                                FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0,
+                                [Organization].[Organization].&[407] on 1
+                                FROM Report
+                                WHERE ([Computation].[Computation].&[Mean],
+                                       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2]
+                                        )";
 
 
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
-                    command.Parameters.Add(new MdxParameter("~[Unit].[Unit].[Unit]", "Store"));
+                    command.Parameters.Add(new MdxParameter("~[Measures].[Response Computation]", "Score"));
+                    command.Parameters.Add(new MdxParameter("~[Organization].[Organization].[Level 05]", "Store"));
                     var dataAdapter = new MdxDataAdapter {SelectCommand = command};
                     dataAdapter.Fill(dataSet);
                 }
@@ -107,8 +113,8 @@ namespace DynamicTyped.Data.Test
                 // Verify data
                 foreach (DataRow item in dataSet.Tables[0].Rows)
                 {
-                    Assert.AreEqual("Toledo Store", item["Store"].ToString());
-                    Assert.AreEqual(96.0, (double) item["Score"]);
+                    Assert.AreEqual("Chicago (IL)", item["Store"].ToString());
+                    Assert.AreEqual(64.6481481481482, (double)item["Score"], .00000001);
                     break;
                 }
             }
@@ -117,12 +123,12 @@ namespace DynamicTyped.Data.Test
         [TestMethod]
         public void NothingOnRowsTest()
         {
-            var connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCapellaDataTestConnection();
             using (connection)
             {
                 connection.Open();
 
-                const string query = @"SELECT [Measures].[Computation] on 0 FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0 FROM Report";
 
                 var x = connection.Query(query);
 
@@ -135,13 +141,16 @@ namespace DynamicTyped.Data.Test
         {
             var dataSet = new DataSet();
 
-            var connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCapellaDataTestConnection();
             using (connection)
             {
                 connection.Open();
-                const string query = @"SELECT [Measures].[Computation] on 0,
-                                [Unit].[Unit].&[Toledo Store] on 1
-                                FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0,
+                                [Organization].[Organization].&[407] on 1
+                                FROM Report
+                                WHERE ([Computation].[Computation].&[Mean],
+                                       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2]
+                                        )";
 
                 using (var command = connection.CreateCommand())
                 {
@@ -156,8 +165,8 @@ namespace DynamicTyped.Data.Test
                 // Verify data
                 foreach (DataRow item in dataSet.Tables[0].Rows)
                 {
-                    Assert.AreEqual("Toledo Store", item[0].ToString());
-                    Assert.AreEqual(96.0, (double) item[1]);
+                    Assert.AreEqual("Chicago (IL)", item[0].ToString());
+                    Assert.AreEqual(64.6481481481482, (double)item[1], .000000001);
                     break;
                 }
             }
@@ -168,19 +177,22 @@ namespace DynamicTyped.Data.Test
         {
             var dataTable = new DataTable();
 
-            var connection = UnitTestHelpers.GetCeCubeConnection();
+            var connection = UnitTestHelpers.GetCapellaDataTestConnection();
             using (connection)
             {
                 connection.Open();
-                const string query = @"SELECT [Measures].[Computation] on 0,
-                                [Unit].[Unit].&[Toledo Store] on 1
-                                FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0,
+                                [Organization].[Organization].&[407] on 1
+                                FROM Report
+                                WHERE ([Computation].[Computation].&[Mean],
+                                       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2]
+                                        )";
 
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
-                    command.Parameters.Add(new MdxParameter("~[Unit].[Unit].[Unit]", "Store"));
+                    command.Parameters.Add(new MdxParameter("~[Measures].[Response Computation]", "Score"));
+                    command.Parameters.Add(new MdxParameter("~[Organization].[Organization].[Level 05]", "Store"));
                     using (var dataAdapter = new MdxDataAdapter())
                     {
                         dataAdapter.SelectCommand = command;
@@ -191,8 +203,8 @@ namespace DynamicTyped.Data.Test
                 // Verify data
                 foreach (DataRow item in dataTable.Rows)
                 {
-                    Assert.AreEqual("Toledo Store", item["Store"].ToString());
-                    Assert.AreEqual(96, int.Parse(item["Score"].ToString()));
+                    Assert.AreEqual("Chicago (IL)", item[0].ToString());
+                    Assert.AreEqual(64.6481481481482, (double)item[1], .000000001);
                     break;
                 }
             }
@@ -201,33 +213,24 @@ namespace DynamicTyped.Data.Test
         [TestMethod]
         public void ParmTest()
         {
-            using (var connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                const string query = @"WITH 
-
-                        MEMBER [Measures].[Employee Value] AS
-                        [Employee].[Employee Full Name].currentmember.uniquename
-
-                        MEMBER [Measures].[Question Value] AS
-                        [Questionnaire].[Question Category].currentmember.uniquename
-
-                        SELECT {[Measures].[Employee Value], [Measures].[Question Value], [Measures].[Computation]} on 0,
-                        ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
-                        FROM [CUBE]
-                        where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
-                       [Computation].[Computation Name].&[Mean],              
-                       @ReportPeriod,
-                           [Report Period].[Report Period Type].&[12 Month]        
-                       )";
+                const string query = @"SELECT [Measures].[Response Computation] ON 0,
+DESCENDANTS([Organization].[Organization].&[61],1)  on 1
+FROM REPORT
+WHERE ([Computation].[Computation].&[Mean], 
+       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2],
+	   @ReportPeriod
+	   )";
 
                 var parms = new DynamicParameters();
-                parms.Add("@ReportPeriod", "[Report Period].[Report Period Name].&[Dec-10]");
-                parms.Add("~[Measures].[Computation]", "score");
+                parms.Add("@ReportPeriod", "[Report Period].[Report Period].&[November 2012]");
+                parms.Add("~[Measures].[Response Computation]", "score");
 
                 var x = connection.Query(query, parms).ToList();
                 Assert.IsNotNull(x.First().score);
-                Assert.AreEqual(28, x.Count());
+                Assert.AreEqual(36, x.Count());
 
             }
         }
@@ -235,25 +238,16 @@ namespace DynamicTyped.Data.Test
         [TestMethod]
         public void NoResultsTest()
         {
-            using (var connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                const string query = @"WITH 
-
-                        MEMBER [Measures].[Employee Value] AS
-                        [Employee].[Employee Full Name].currentmember.uniquename
-
-                        MEMBER [Measures].[Question Value] AS
-                        [Questionnaire].[Question Category].currentmember.uniquename
-
-                        SELECT {[Measures].[Employee Value], [Measures].[Question Value], [Measures].[Computation]} on 0,
-                        ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
-                        FROM [CUBE]
-                        where ([Unit].[Organization].[Region].&[Central].&[1],
-                       [Computation].[Computation Name].&[Mean],              
-                       [Report Period].[Report Period Name].&[Dec-10],
-                           [Report Period].[Report Period Type].&[12 Month]        
-                       )";
+                const string query = @"SELECT [Measures].[Response Computation] ON 0,
+NON EMPTY(DESCENDANTS([Organization].[Organization].&[61],1))  on 1
+FROM REPORT
+WHERE ([Computation].[Computation].&[Mean], 
+       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2],
+	   [Report Period].[Report Period].&[November 20123]
+	   )";
 
                 var x = connection.Query(query);
                 Assert.AreEqual(0, x.Count());
@@ -264,52 +258,45 @@ namespace DynamicTyped.Data.Test
         [TestMethod]
         public void ColumnMappingOrdinalOnlyTest()
         {
-            using(var connection = UnitTestHelpers.GetCeCubeConnection())
+            using(var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                const string query = @"SELECT {[Measures].[Computation]} on 0,
-                        ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
-                        FROM [CUBE]
-                        where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
-                       [Computation].[Computation Name].&[Mean],              
-                       [Report Period].[Report Period Name].&[Dec-10],
-                           [Report Period].[Report Period Type].&[Month]        
-                       )";
+                const string query = @"SELECT [Measures].[Response Computation] ON 0,
+DESCENDANTS([Organization].[Organization].&[61],1) * [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2] on 1
+FROM REPORT
+WHERE [Computation].[Computation].&[Mean]";
+                
                 var parms = new DynamicParameters();
                 parms.Add("~0", "label");
                 parms.Add("~2", "score");
 
                 var x = connection.Query<StandardScore>(query, parms).ToList();
                 var specificItem = x.First();
-                Assert.AreEqual(16, x.Count, "item count");
-                Assert.AreEqual(62, specificItem.Score, "score");
-                Assert.AreEqual("Barbara Suiter", specificItem.Label, "label");
+                Assert.AreEqual(36, x.Count, "item count");
+                Assert.AreEqual(66.79, specificItem.Score, .01, "score");
+                Assert.AreEqual("Mexico City", specificItem.Label, "label");
             }
         }
 
         [TestMethod]
         public void ColumnMappingMixingTildaAndOrdinalTest()
         {
-            using (var connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                const string query = @"SELECT {[Measures].[Computation]} on 0,
-                        ([EmployeesWithScores], {[Questionnaire].[Question Short Text].&[Facility: Appearance]}) on 1
-                        FROM [CUBE]
-                        where ([Unit].[Organization].[Region].&[Central].&[Toledo Store],
-                       [Computation].[Computation Name].&[Mean],              
-                       [Report Period].[Report Period Name].&[Dec-10],
-                           [Report Period].[Report Period Type].&[3 Month]        
-                       )";
+                const string query = @"SELECT [Measures].[Response Computation] ON 0,
+DESCENDANTS([Organization].[Organization].&[61],1) * [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2] on 1
+FROM REPORT
+WHERE [Computation].[Computation].&[Mean]";
                 var parms = new DynamicParameters();
                 parms.Add("~0", "label");
-                parms.Add("~[Measures].[Computation]", "score");
+                parms.Add("~[Measures].[Response Computation]", "score");
 
                 var x = connection.Query<StandardScore>(query, parms).ToList();
                 var specificItem = x.First();
-                Assert.AreEqual(24, x.Count, "item count");
-                Assert.AreEqual(44, specificItem.Score);
-                Assert.AreEqual("Barbara Suiter", specificItem.Label, "label");
+                Assert.AreEqual(36, x.Count, "item count");
+                Assert.AreEqual(66.79, specificItem.Score, .01);
+                Assert.AreEqual("Mexico City", specificItem.Label, "label");
             }
         }
         
@@ -317,21 +304,24 @@ namespace DynamicTyped.Data.Test
         public void ExecuteScalarTest()
         {
             object scalar;
-            using (var connection = UnitTestHelpers.GetCeCubeConnection())
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
             {
                 connection.Open();
-                const string query = @"SELECT [Measures].[Computation] on 0,
-                                [Unit].[Unit].&[Toledo Store] on 1
-                                FROM [CUBE]";
+                const string query = @"SELECT [Measures].[Response Computation] on 0,
+                                [Organization].[Organization].&[407] on 1
+                                FROM Report
+                                WHERE ([Computation].[Computation].&[Mean],
+                                       [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[Q2]
+                                        )";
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = query;
-                    command.Parameters.Add(new MdxParameter("~[Measures].[Computation]", "Score"));
-                    command.Parameters.Add(new MdxParameter("~[Unit].[Unit].[Unit]", "Store"));
+                    command.Parameters.Add(new MdxParameter("~[Measures].[Response Computation]", "Score"));
+                    command.Parameters.Add(new MdxParameter("~[Organization].[Organization].[Level 05]", "Store"));
                     scalar = command.ExecuteScalar();
                 }
             }
-            Assert.AreEqual("Toledo Store", scalar.ToString());
+            Assert.AreEqual("Chicago (IL)", scalar.ToString());
         }
 
         [TestMethod]
@@ -718,6 +708,58 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 Assert.AreEqual(4, specificItem.HierarchyLevel);
                 Assert.AreEqual("[Organization].[Organization].&[407]", specificItem.MdxValue);
                 Assert.AreEqual("[Organization].[Organization].&[61]", specificItem.ParentMdxValue);
+            }
+        }
+
+        [TestMethod]
+        public void SpecialColumnsNoRowsTest()
+        {
+            const string query = @" WITH 
+                            
+                            MEMBER ParentMdxValue AS
+							[Verbatim Taxonomy].[Verbatim Taxonomy Level 1 - 2 - 3].currentmember.parent.uniquename
+
+							MEMBER Score AS
+							[Measures].[Verbatim Sentence Sentiment Score] / [Measures].[Verbatim Analysis Sentence Count]
+
+							MEMBER ComparatorScore AS
+							CASE 
+							 WHEN [Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment].currentmember IS [Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment].&[Negative] THEN 1.000
+                             WHEN [Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment].currentmember IS [Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment].&[Positive] THEN 0.001
+							 ELSE Score
+							END
+
+							SELECT {[Measures].[Verbatim Analysis Sentence Count], Score, ComparatorScore, ParentMdxValue} ON 0,
+							NONEMPTY(DESCENDANTS([Verbatim Taxonomy].[Verbatim Taxonomy Level 1 - 2 - 3].[All], 1)*[Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment].[Verbatim Sentence Sentiment],[Measures].[Verbatim Analysis Sentence Count]) ON 1
+							FROM REPORT
+							WHERE
+							(
+								[Report Period].[Report Period].&[November 2012],
+								[Report Period].[Report Period Type].&[3 Month Roll],
+								[Organization].[Organization Hierarchy Name].&[Sales Demo],
+								[Organization].[Organization].&[407],
+								[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[oa]
+								,[Population].[Population Attribute 1].[All],[Population].[Population Attribute 2].[All],[Population].[Population Attribute 3].[All]
+							)";
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            {
+                connection.Open();
+
+                var parms = new DynamicParameters();
+
+                parms.Add("~[Measures].[Verbatim Analysis Sentence Count]", "Count");
+				parms.Add("~[Measures].[Score]", "Score");
+				parms.Add("~[Measures].[ComparatorScore]", "ComparatorScore");
+				parms.Add("~0", "Label");
+				parms.Add("~0##UniqueName##", "MdxValue");
+                parms.Add("~0##LevelNumber##", "HierarchyLevel");
+                parms.Add("~1", "SupplementalLabel");
+				parms.Add("~1##UniqueName##", "SupplementalMdxValue");
+                parms.Add("~[Measures].[ParentMdxValue]", "ParentMdxValue");
+
+                var actual = connection.Query(query, parms);
+
+                Assert.AreEqual(0, actual.Count());
             }
         }
     }

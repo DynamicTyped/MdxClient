@@ -686,14 +686,12 @@ namespace MdxClient
         private ColumnMap GetColumnMap(Column column, string columnName = null)
         {
             var name = columnName ?? column.Name;
-#if DEBUG
-            var columMap = _columnMap.Where(a => string.Equals(a.NameWithoutPrefixes, name) ||
-                                                 string.Equals(a.Value.ToString(), name) ||
-                                                 ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
-#endif
-            return _columnMap.SingleOrDefault(a => string.Equals(a.NameWithoutPrefixes, name) ||
-                                                   string.Equals(a.Value.ToString(), name) || 
-                                                   ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
+
+            var nameMatch =_columnMap.SingleOrDefault(a => string.Equals(a.NameWithoutPrefixes, name));
+            var valueMatch = _columnMap.SingleOrDefault(a => string.Equals(a.Value.ToString(), name));
+            var ordinalMatch = _columnMap.SingleOrDefault(a => ConvertIt(a.NameWithoutPrefixes) == column.ColumnOrdinal);
+
+            return nameMatch ?? valueMatch ?? ordinalMatch;
         }
 
         protected override void Dispose(bool disposing)
