@@ -372,21 +372,36 @@ namespace MdxClient
                     
                 }
 
-                foreach (var dimensionProperty in (from x in rows
-                                             from y in x.Members
-                                             from z in y.DimensionProperties
-                                             select new
-                                             {
-                                                 ParentColumn = y.LevelName,
-                                                 ChildColumn = z.UniqueName
-                                             }).Distinct())
+                var dimensionPropertyColumns = rows.SelectMany(
+                           (row) => row.Members.SelectMany(
+                               // Project the dimension properties so we also get the member's index within the row for each:
+                                  (member, memberIndex) => member.DimensionProperties.Select(
+                                         (dimensionProp) => new
+                                         {
+                                             DimensionProperty = dimensionProp,
+                                             MemberIndex = memberIndex
+                                         }),
+                               // Turn all this business into what we're really looking for:
+                                  (member, x) => new
+                                  {
+                                      //ParentColumn = member.LevelName,
+                                      ChildColumn = x.DimensionProperty.UniqueName,
+                                      MemberIndex = x.MemberIndex
+                                  })).Distinct();
+
+
+                // dimension properties are looked at for all rows where the columns above is just the first row
+                // it is very possible to get data in further down rows for a dimension properties that doesn't exist on the first row
+                // an example is in org with parent child where a property may exist for only one level
+                foreach (var dimensionProperty in dimensionPropertyColumns)
                 {
                     var propertyColumn = new Column() {ColumnOrdinal = columnCount};
                     //only add column if not already added
                     // each column can have a dimension property that may already be present
-                    if (!dimensionProperties.Any(a => string.Equals(a, dimensionProperty.ChildColumn)))
+                    var columnName = dimensionProperty.MemberIndex.ToString(CultureInfo.InvariantCulture) + dimensionProperty.ChildColumn;
+                    if (!dimensionProperties.Any(a => string.Equals(a, columnName)))
                     {
-                        SetColumnNameAndType(propertyColumn, dimensionProperty.ChildColumn, typeof(string));
+                        SetColumnNameAndType(propertyColumn, columnName, typeof(string));
                         columnCount++;
                         crs.Columns.Add(propertyColumn);
                         propertyColumn.Items.Add(propertyColumn.Name);
@@ -568,17 +583,21 @@ namespace MdxClient
                 foreach (var row in rows)
                 {
                     var r = new Row();
+
+                    // main row data
                     foreach (var member in row.Members)
                     {
                         r.Cells.Add(new Cell() { FormattedValue = member.Caption, Value = member.Caption, Ordinal = ordinal++ });
-                        if (member.DimensionProperties != null)
-                        {
-                            foreach (var property in member.DimensionProperties)
-                            {
-                                r.Cells.Add(new Cell() { FormattedValue = property.Value, Value = property.Value, Ordinal = ordinal++});
-                            }
-                        }
+                        
                     }
+
+                    // dimension property row data
+                    // this is done as another pass since dimension properties columns are added at the end of normal columns from row
+                    foreach (var property in row.Members.Where(member => member.DimensionProperties != null).SelectMany(member => member.DimensionProperties))
+                    {
+                        r.Cells.Add(new Cell() { FormattedValue = property.Value, Value = property.Value, Ordinal = ordinal++ });
+                    }
+
                     
                     // cells are in a single dimension array, have to determine which row it belongs to to intermix the row data correctly
                     for (var i = start; i <= finish; i++)

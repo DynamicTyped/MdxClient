@@ -693,15 +693,16 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 var parms = new DynamicParameters();
                 parms.Add("~0", "Label");
                 parms.Add("~0##UniqueName##", "MdxValue");
+                parms.Add("~0##LevelNumber##", "HierarchyLevel");
                 parms.Add("~1", "SqlValue");
                 parms.Add("~2", "ParentMdxValue");
                 parms.Add("~3", "ParentSqlValue");
-                parms.Add("~0##LevelNumber##", "HierarchyLevel");
-             
 
-                var actual = connection.Query<Metric>(query, parms);
+                var x = connection.Query(query, parms);
+
+                var actual = connection.Query<Metric>(query, parms).ToList();
                 Assert.IsNotNull(actual);
-                Assert.AreEqual(37, actual.Count());
+                Assert.AreEqual(37, actual.Count);
                 var specificItem = actual.Single(a => string.Equals(a.Label, "Chicago (IL)", StringComparison.OrdinalIgnoreCase));
                 Assert.AreEqual("R11", specificItem.ParentSqlValue);
                 Assert.AreEqual("U401", specificItem.SqlValue);
@@ -709,6 +710,62 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 Assert.AreEqual("[Organization].[Organization].&[407]", specificItem.MdxValue);
                 Assert.AreEqual("[Organization].[Organization].&[61]", specificItem.ParentMdxValue);
             }
+        }
+
+        [TestMethod]
+        public void DimensionPropertyWithTwoHierarchiesHavingTheSamePropertyTest()
+        {
+            const string query = @"WITH 
+
+MEMBER UnitParentValue AS
+[Organization].[Organization].currentmember.parent.uniquename
+
+MEMBER DisplayScore AS
+ROUND([Measures].[Response Computation], 0)
+			
+SELECT {[Measures].[Response Computation], DisplayScore ,[Measures].[Response Count] } ON 0,
+(DESCENDANTS([Organization].[Organization].&[61],1,SELF), [Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[oa] )
+DIMENSION PROPERTIES Parent_Unique_Name		on 1
+FROM [Report]
+WHERE 
+(
+	[Questionnaire].[Response Value Type].&[code],
+	[Computation].[Computation].&[Mean],
+	[Report Period].[Report Period].&[November 2012],
+	[Organization].[Organization Hierarchy Name].&[Sales Demo],
+	[Report Period].[Report Period Type].&[3 Month Roll]
+)";
+            using (var connection = UnitTestHelpers.GetCapellaDataTestConnection())
+            {
+                connection.Open();
+                var parms = new DynamicParameters();
+
+                parms.Add("~0", "SupplementalLabel");
+                parms.Add("~0##UniqueName##", "SupplementalMdxValue");
+                parms.Add("~0##LevelNumber##", "HierarchyLevel");
+                parms.Add("~1", "Label");
+                parms.Add("~1##UniqueName##", "MdxValue");
+                parms.Add("~2", "SupplementalParentMdxValue");
+                parms.Add("~[Measures].[DisplayScore]", "Score");
+                parms.Add("~[Measures].[Response Computation]", "RawScore");
+                parms.Add("~[Measures].[Response Count]", "Count");
+                parms.Add("~[Measures].[ComparatorScore]", "ComparatorScore");
+
+                var actual = connection.Query<Metric>(query, parms).ToList();
+
+                Assert.AreEqual(36, actual.Count, "item count");
+                var specificItem = actual.Single(a => a.SupplementalMdxValue == "[Organization].[Organization].&[407]");
+                Assert.AreEqual(192, specificItem.Count, "return count");
+                Assert.AreEqual(56, specificItem.Score, "score");
+                Assert.AreEqual("Overall satisfaction", specificItem.Label, "question label");
+                Assert.AreEqual("[Questionnaire].[Questionnaire Version - Questionnaire - Question Category - Question].[Question].&[SalesDemo]&[2]&[oa]", specificItem.MdxValue, "question mdxvalue");
+                Assert.AreEqual(4, specificItem.HierarchyLevel, "hierarchy level");
+                Assert.AreEqual("Chicago (IL)", specificItem.SupplementalLabel, "entity label");
+                Assert.AreEqual("[Organization].[Organization].&[61]", specificItem.SupplementalParentMdxValue, "entity parent mdx value");
+                Assert.AreEqual("56.1197916666667", specificItem.RawScore.ToString(), "raw score");
+
+            }
+
         }
 
         [TestMethod]
@@ -762,5 +819,8 @@ WHERE ([Organization].[Organization Hierarchy Name].&[Sales Demo])";
                 Assert.AreEqual(0, actual.Count());
             }
         }
+
+
+
     }
 }
