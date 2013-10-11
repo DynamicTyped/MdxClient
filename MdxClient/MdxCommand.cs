@@ -683,7 +683,16 @@ namespace MdxClient
         /// <param name="columnMap"></param>
         private static void AddColumnsFromRowProperties(ResultSet crs, IEnumerable<ColumnMap> columnMap)
         {
-            var max = crs.Columns.Select(a => a.CellOrdinal).Max();
+            int max;
+            var cels = crs.Columns.Select(a => a.CellOrdinal);
+            if (cels.Any())
+            {
+                max = cels.Max();
+            }
+            else
+            {
+                max = 0;
+            }
             foreach(var map in columnMap)
             {
                 var type = map.IsLevelNumber ? typeof(int) : typeof (string);
