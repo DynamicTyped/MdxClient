@@ -95,6 +95,17 @@ Usage
 
 ### Dapper
 
+Poco
+```csharp
+public class StandardScore
+{
+     public string Label { get; set; }
+     public string Score { get; set; }
+}
+```
+
+Query Section
+
 ```csharp
 using(MdxConnection connection = new MdxConnection(connectionString))
 {
