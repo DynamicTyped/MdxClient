@@ -100,7 +100,7 @@ Poco
 public class StandardScore
 {
      public string Label { get; set; }
-     public string Score { get; set; }
+     public decimal Score { get; set; }
 }
 ```
 
