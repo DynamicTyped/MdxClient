@@ -52,7 +52,7 @@ parameter.Value = "Zone";
 #### Member properties
 
 Member properties are special attributes of a given member.  They allow you to access values from the member without having to specify them in your MDX query.
-Currently there are three that are supported; *Caption*, *LevelName*, *LevelNumber*, and *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
+Currently there are four that are supported; *Caption*, *LevelName*, *LevelNumber*, and *UniqueName*.  These properties can be applied to both types of tilde parameters (named and ordinal).
 To utilize them, they must be pre and post appended with `##`.  Caption is generally not needed, as just asking for the column by name returns the caption.  
 These member properties are only applied to members on rows.
 
