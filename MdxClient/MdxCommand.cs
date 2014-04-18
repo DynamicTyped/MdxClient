@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using Microsoft.AnalysisServices.AdomdClient;
 using System.Data.Common;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace MdxClient
 {
@@ -138,6 +139,7 @@ namespace MdxClient
             set
             {
                 _connection = (MdxConnection)value;
+				_command.Connection = _connection.Connection;
             }
         }
 
@@ -182,9 +184,6 @@ namespace MdxClient
 
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
-            _command.Connection = new AdomdConnection(Connection.ConnectionString);
-            _command.Connection.Open();
-
             var allParameters = GetParams();
             _columnMap = allParameters.Where(a => a.Name.StartsWith(ColumnMap.ColumnRename, StringComparison.OrdinalIgnoreCase));
 
@@ -723,17 +722,15 @@ namespace MdxClient
         }
 
         protected override void Dispose(bool disposing)
-        {
-            if (null != _command.Connection && _command.Connection.State == ConnectionState.Open)
-            {
-                _command.Connection.Close();
-            }
+		{
+			if (disposing)
+			{
+				_command.Dispose();
+			}
 
-            _command.Dispose();
+			base.Dispose(disposing);
+		}
 
-            base.Dispose(disposing);
-        }
-    }
-
-        #endregion
+		#endregion
+	}
 }
